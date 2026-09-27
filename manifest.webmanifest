@@ -1,0 +1,9 @@
+{
+  "name":"Banxxgram",
+  "short_name":"Banxxgram",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#05070d",
+  "theme_color":"#087cff",
+  "icons":[{"src":"assets/favicon.svg","sizes":"128x128","type":"image/svg+xml"}]
+}
