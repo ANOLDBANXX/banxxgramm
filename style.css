@@ -30,3 +30,9 @@ button{cursor:pointer}
 .toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#121b2a;border:1px solid var(--blue);padding:11px 16px;border-radius:10px;transition:.25s;z-index:50}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:1050px){.layout{grid-template-columns:190px minmax(0,650px)}.rightbar{display:none}}
 @media(max-width:720px){.topbar{height:62px;padding:0 12px}.top-search{display:none}.brand{font-size:20px}.topnav{gap:0}.nav-btn span,.side-link span{display:none}.nav-btn{font-size:20px}.layout{display:block;width:100%;margin:0}.sidebar{display:none}.content{width:100%}.stories{border-radius:0;border-left:0;border-right:0}.post{border-radius:0;border-left:0;border-right:0}.post-photo{min-height:300px}.profile-head{border-radius:0}.page-card{border-radius:0;border-left:0;border-right:0}.stats{gap:10px;font-size:13px}}
+.site-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    display: block;
+}
