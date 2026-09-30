@@ -1,189 +1,170 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#05070d">
-  <meta name="description" content="Banxxgram — Share, connect, and express yourself seamlessly.">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Supabase JS Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<header class="topbar">
-  <a class="brand" href="#home" aria-label="Banxxgram home">
-    <img src="logo.svg" alt="Banxxgram Logo" class="site-logo">
-    <span>Banxx<span>gram</span></span>
-  </a>
+  <!-- Topbar Header -->
+  <header class="topbar">
+    <a href="#home" class="brand">
+      <img src="logo.png" alt="Banxxgram Logo" class="site-logo" onerror="this.style.display='none'">
+      <span>Banxx<span>gram</span></span>
+    </a>
 
-  <div class="top-search">
-    <input id="globalSearch" type="search" placeholder="Search users, posts, or hashtags…" aria-label="Search Banxxgram">
-  </div>
-
-  <nav class="topnav" aria-label="Main navigation">
-    <button data-section="home" class="nav-btn active" title="Home">
-      <span class="icon">⌂</span> <span class="label">Home</span>
-    </button>
-    <button data-section="search" class="nav-btn" title="Search">
-      <span class="icon">⌕</span> <span class="label">Search</span>
-    </button>
-    <button data-section="create" class="nav-btn" title="Create">
-      <span class="icon">＋</span> <span class="label">Create</span>
-    </button>
-    <button data-section="profile" class="nav-btn" title="Profile">
-      <span class="icon">◉</span> <span class="label">Profile</span>
-    </button>
-    
-    <!-- Account & Switcher Options -->
-    <div class="auth-buttons">
-      <button id="headerSignInBtn" class="nav-btn auth-nav-btn primary-sm">Sign In</button>
-      <button id="headerSignUpBtn" class="nav-btn auth-nav-btn secondary-sm">Sign Up</button>
-      <div class="account-switcher-dropdown hidden" id="accountDropdown">
-        <button id="switchUserBtn" class="nav-btn switch-btn">Switch Account</button>
-        <button id="logoutBtn" class="nav-btn logout-btn">Log Out</button>
-      </div>
-    </div>
-  </nav>
-</header>
-
-<main class="layout">
-  <!-- Left Navigation Sidebar -->
-  <aside class="sidebar card">
-    <div class="side-user" id="currentUserCard">
-      <div class="avatar" id="sideAvatar"></div>
-      <div class="user-details">
-        <strong id="sideDisplayName">Guest User</strong>
-        <small id="sideUsername">@guest</small>
-      </div>
+    <div class="top-search">
+      <input type="text" id="globalSearch" placeholder="Search users, posts, or hashtags...">
     </div>
 
-    <nav class="side-menu">
-      <button data-section="home" class="side-link active">⌂ <span>Home</span></button>
-      <button data-section="search" class="side-link">⌕ <span>Search</span></button>
-      <button data-section="create" class="side-link">＋ <span>Create Post</span></button>
-      <button data-section="profile" class="side-link">◉ <span>Profile</span></button>
+    <nav class="topnav">
+      <button class="nav-btn active" data-section="home"><span>Home</span></button>
+      <button class="nav-btn" data-section="search"><span>Search</span></button>
+      <button class="nav-btn" data-section="create">+ <span>Create</span></button>
+      <button class="nav-btn" data-section="profile"><span>Profile</span></button>
+      
+      <!-- Dynamic Auth Buttons -->
+      <button class="nav-btn" id="headerSignInBtn">Sign In</button>
+      <button class="nav-btn" id="headerSignUpBtn">Sign Up</button>
     </nav>
+  </header>
 
-    <div class="side-divider"></div>
+  <!-- Main Grid Layout -->
+  <main class="layout">
 
-    <div class="side-note">
-      <strong>BANXXGRAM</strong><br>
-      <span>Share • Connect • Be You</span>
-    </div>
-  </aside>
-
-  <!-- Central Content Area -->
-  <section class="content">
-    <!-- Home Feed View -->
-    <section id="home" class="page active">
-      <div class="stories card" id="stories"></div>
-      <div id="feed" class="feed-container"></div>
-    </section>
-
-    <!-- Search & Discovery View -->
-    <section id="search" class="page">
-      <div class="card page-card">
-        <h1>Search & Explore</h1>
-        <p class="muted">Find creators, friends, and trending discussions across Banxxgram.</p>
-        <input id="searchInput" class="full-input" type="search" placeholder="Search people or hashtags…" autocomplete="off">
-        <div id="results" class="results empty">Start typing to search accounts.</div>
+    <!-- Left Sidebar -->
+    <aside class="sidebar card">
+      <div class="side-user">
+        <div class="avatar" id="sideAvatar">GU</div>
+        <div>
+          <strong id="sideDisplayName">Guest User</strong>
+          <small id="sideUsername">@guest</small>
+        </div>
       </div>
-    </section>
 
-    <!-- Create Post View -->
-    <section id="create" class="page">
-      <div class="card page-card">
-        <h1>Create Post</h1>
-        <p class="muted">Share a moment, update, or photo with your followers.</p>
-        
-        <form id="createPostForm" onsubmit="return false;">
+      <nav>
+        <button class="side-link active" data-section="home">🏠 Home</button>
+        <button class="side-link" data-section="search">🔍 Search</button>
+        <button class="side-link" data-section="create">➕ Create Post</button>
+        <button class="side-link" data-section="profile">👤 Profile</button>
+      </nav>
+
+      <div class="side-divider"></div>
+
+      <div class="side-note">
+        BANXXGRAM
+        <span>Share • Connect • Be You</span>
+      </div>
+    </aside>
+
+    <!-- Center Content Pages -->
+    <section class="content">
+
+      <!-- Home Feed -->
+      <div id="home" class="page active">
+        <div class="stories card" id="stories"></div>
+        <div id="feed"></div>
+      </div>
+
+      <!-- Search View -->
+      <div id="search" class="page">
+        <div class="card page-card">
+          <h1>Search Banxxgram</h1>
+          <input type="text" id="searchInput" class="full-input" placeholder="Search by username or handle...">
+          <div id="results" class="results empty">Start typing to search.</div>
+        </div>
+      </div>
+
+      <!-- Create Post View (Supports Photos & Videos) -->
+      <div id="create" class="page">
+        <div class="card page-card">
+          <h1>Create New Post</h1>
+          
           <label for="postText">Caption</label>
-          <textarea id="postText" maxlength="500" rows="4" placeholder="What's on your mind?"></textarea>
-          
-          <label for="postImage">Photo</label>
-          <input id="postImage" type="file" accept="image/*">
-          
-          <div id="imagePreview" class="image-preview">
-            <span>No photo selected</span>
-          </div>
+          <textarea id="postText" rows="4" class="full-input" placeholder="What's on your mind?"></textarea>
 
-          <button id="publishBtn" type="button" class="primary full-width">Share Post</button>
-        </form>
-      </div>
-    </section>
+          <label for="postMedia">Upload Photo or Video</label>
+          <input type="file" id="postMedia" accept="image/*,video/*">
 
-    <!-- User Profile View -->
-    <section id="profile" class="page">
-      <div class="card profile-head" id="profileHeader">
-        <div class="avatar big" id="profileAvatar"></div>
-        <div class="profile-info">
-          <div class="profile-title-row">
-            <h1 id="profileUsername">@username</h1>
-            <button id="editProfileBtn" class="btn-secondary-sm">Edit Profile</button>
-          </div>
-          <p id="profileBio" class="bio-text">No bio added yet.</p>
-          <div class="stats">
-            <span><b id="postCount">0</b> posts</span>
-            <span><b id="followerCount">0</b> followers</span>
-            <span><b id="followingCount">0</b> following</span>
-          </div>
+          <div id="mediaPreview" class="image-preview">No media selected</div>
+
+          <button id="publishBtn" class="primary" style="margin-top: 15px;">Publish Post</button>
         </div>
       </div>
 
-      <div id="profileGrid" class="profile-grid"></div>
-    </section>
-  </section>
+      <!-- Profile View -->
+      <div id="profile" class="page">
+        <div class="card page-card profile-head">
+          <div class="avatar big" id="profileAvatar">GU</div>
+          <div class="profile-info">
+            <h1 id="profileUsername">@guest</h1>
+            <p id="profileBio">No bio added yet.</p>
 
-  <!-- Right Sidebar -->
-  <aside class="rightbar">
-    <div class="card suggestion">
-      <h3>Suggested Accounts</h3>
-      <div id="suggestions" class="suggestions-list"></div>
-    </div>
-
-    <div class="card about">
-      <h3>Banxxgram</h3>
-      <p>A modern social application interface built with HTML, CSS, and JavaScript.</p>
-      <span class="badge">PRO VERSION READY</span>
-    </div>
-  </aside>
-</main>
-
-<!-- Authentication & Account Selection Modal -->
-<div id="authModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-  <div class="modal-content card">
-    <button class="modal-close" id="closeAuthModal">&times;</button>
-    <div id="authForms">
-      <h2 id="authTitle">Welcome to Banxxgram</h2>
-      <p id="authSubtitle" class="muted">Sign in or switch to an existing demo profile:</p>
-
-      <!-- Quick Switcher Demo Accounts -->
-      <div class="quick-accounts" id="quickAccountList">
-        <p class="small-label">Quick Switch Demo Accounts:</p>
-        <div class="account-chips">
-          <button class="chip" data-user="lynda">Lynda (@lynda.banxx)</button>
-          <button class="chip" data-user="sarah">Sarah (@sarah.styles)</button>
-          <button class="chip" data-user="john">John (@john.d)</button>
+            <div class="stats">
+              <span><b id="postCount">0</b> posts</span>
+              <span><b id="followerCount">0</b> followers</span>
+              <span><b id="followingCount">0</b> following</span>
+            </div>
+          </div>
         </div>
+
+        <div class="profile-grid" id="profileGrid"></div>
       </div>
 
-      <div class="auth-divider"><span>OR</span></div>
+    </section>
 
-      <form id="authForm" onsubmit="return false;">
-        <input type="email" id="authEmail" placeholder="Email address" required>
-        <input type="password" id="authPassword" placeholder="Password" required>
-        <button id="authSubmitBtn" class="primary full-width">Sign In</button>
-      </form>
+    <!-- Right Sidebar -->
+    <aside class="rightbar">
+      <div class="card suggestion">
+        <h3>Suggested Accounts</h3>
+        <div id="suggestions"></div>
+      </div>
+
+      <div class="card about">
+        <h3>Banxxgram</h3>
+        <p class="muted">A modern social application interface built with HTML, CSS, JavaScript & Supabase.</p>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Auth Modal Overlay -->
+  <div id="authModal" class="modal-overlay hidden">
+    <div class="card modal-card">
+      <button class="close-btn" id="closeAuthModal">&times;</button>
+      <h2>Sign In / Switch Account</h2>
+      <p class="muted">Select a demo profile or sign in with your account.</p>
+
+      <div class="auth-chips">
+        <span class="chip" data-user="anold">@anold.banxx</span>
+        <span class="chip" data-user="lynda">@lynda.banxx</span>
+        <span class="chip" data-user="sarah">@sarah.styles</span>
+        <span class="chip" data-user="john">@john.daily</span>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="authEmail" class="full-input" placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="authPassword" class="full-input" placeholder="••••••••">
+      </div>
+
+      <div class="auth-actions">
+        <button id="modalSignInBtn" class="primary">Sign In</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- Notification Toast -->
+  <div id="toast" class="toast"></div>
 
-<!-- External Dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js" defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
