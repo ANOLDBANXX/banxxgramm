@@ -52,9 +52,8 @@ const demo = [
 ];
 
 let posts = JSON.parse(localStorage.getItem(KEY) || "null") || demo;
-let previewMedia = null;
-
-let currentUser = null;
+const SUPABASE_URL = "https://pniuwblnrhybnkdggbim.supabase.co";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_FULL_PUBLISHABLE_KEY_HERE";let currentUser = null;
 let currentProfile = null;
 let demoAccount = null;
 
