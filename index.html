@@ -4,203 +4,214 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
   <div class="app-layout">
-    <!-- SIDEBAR -->
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
       <div class="brand">Banxxgram</div>
-      
-      <div class="user-card card">
-        <div class="avatar lg" id="sideAvatar">GU</div>
+
+      <div class="user-card" id="sidebarUserCard">
+        <div class="avatar" id="sidebarAvatar">U</div>
         <div class="user-info">
-          <strong id="sideDisplayName">Guest User</strong>
-          <small id="sideUsername" class="muted">@guest</small>
+          <strong id="sidebarFullName">User Name</strong>
+          <small id="sidebarUsername">@username</small>
         </div>
       </div>
 
       <nav class="nav-menu">
-        <button class="nav-item active" data-section="home">
-          <span class="icon">⛺</span> Home
+        <button class="nav-item active" data-page="home-page">
+          <span class="icon">🏠</span> Home
         </button>
-        <button class="nav-item" data-section="create">
+        <button class="nav-item" data-page="shorts-page">
           <span class="icon">⚡</span> Shorts
         </button>
-        <button class="nav-item" data-section="search">
-          <span class="icon">👥</span> Subscriptions
+        <button class="nav-item" data-page="subscriptions-page">
+          <span class="icon">📹</span> Subscriptions
         </button>
-      </nav>
 
-      <div class="nav-divider">You ›</div>
-      
-      <nav class="nav-menu">
-        <button class="nav-item" data-section="profile">
+        <div class="nav-divider">You ›</div>
+
+        <button class="nav-item" data-page="profile-page">
           <span class="icon">👤</span> Profile
         </button>
-        <button class="nav-item" data-section="history">
+        <button class="nav-item" data-page="history-page">
           <span class="icon">🕒</span> History
         </button>
-        <button class="nav-item" data-section="liked">
+        <button class="nav-item" data-page="liked-page">
           <span class="icon">♥</span> Liked Videos
         </button>
-        <button class="nav-item" data-section="watch-later">
+        <button class="nav-item" data-page="watch-later-page">
           <span class="icon">🏷️</span> Watch Later
-        </button>
-      </nav>
-
-      <div class="nav-divider">Explore</div>
-      
-      <nav class="nav-menu">
-        <button class="nav-item" data-section="search">
-          <span class="icon">🔍</span> Search
-        </button>
-        <button class="nav-item" data-section="music">
-          <span class="icon">🎵</span> Music
         </button>
       </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT AREA -->
     <main class="main-content">
-      <!-- HEADER -->
+      <!-- TOP HEADER -->
       <header class="top-header">
         <div class="search-bar">
-          <input type="text" id="globalSearch" placeholder="Search...">
+          <input type="text" id="searchInput" placeholder="Search...">
           <span class="search-icon">🔍</span>
         </div>
         <div class="header-actions">
-          <button class="btn primary" data-section="create">+ Create</button>
-          <button class="btn secondary" id="headerSignInBtn">Switch Account</button>
-          <button class="btn primary" id="headerSignUpBtn">Log Out</button>
+          <button class="btn primary" id="openCreatePostBtn">+ Create</button>
+          <button class="btn secondary" id="switchAccountBtn">Switch Account</button>
+          <button class="btn secondary" id="logoutBtn">Log Out</button>
         </div>
       </header>
 
       <!-- HOME PAGE -->
-      <section id="home" class="page active">
-        <div id="stories" class="stories-container"></div>
-        <div id="feed" class="feed-container"></div>
-      </section>
-
-      <!-- CREATE POST PAGE -->
-      <section id="create" class="page">
-        <div class="card page-card">
-          <h2>Create New Post</h2>
-          <div class="form-group">
-            <textarea id="postText" placeholder="What's on your mind?"></textarea>
+      <section id="home-page" class="page active">
+        <div class="stories-container" id="storiesContainer">
+          <div class="story">
+            <div class="avatar" id="yourStoryAvatar">U</div>
+            <span>Your story</span>
           </div>
-          <div class="form-group">
-            <label for="postImage" class="btn secondary">Choose File</label>
-            <input type="file" id="postImage" accept="image/*,video/*" style="display:none;">
-            <div id="imagePreview" class="preview-box">No file selected</div>
-          </div>
-          <button id="publishBtn" class="btn primary">Publish Post</button>
         </div>
-      </section>
-
-      <!-- SEARCH PAGE -->
-      <section id="search" class="page">
-        <div class="card page-card">
-          <h2>Search Profiles</h2>
-          <input type="text" id="searchInput" placeholder="Type username to search...">
-          <div id="results" class="results empty">Start typing to search.</div>
+        <div class="feed-container" id="feedContainer">
+          <!-- Posts rendered dynamically -->
         </div>
       </section>
 
       <!-- PROFILE PAGE -->
-      <section id="profile" class="page">
-        <div class="card page-card profile-header-card">
+      <section id="profile-page" class="page">
+        <div class="card profile-header-card">
           <div class="profile-main">
-            <div class="avatar xl" id="profileAvatar">GU</div>
+            <div class="avatar xl" id="profileAvatar">U</div>
             <div>
-              <h2 id="profileUsername">@guest</h2>
-              <p id="profileBio" class="muted">No bio added yet.</p>
-              <button id="openEditProfileBtn" class="btn secondary" style="margin-top: 10px;">Edit Profile</button>
+              <h2 id="profileUsername">@username</h2>
+              <p id="profileBio" class="muted">Welcome to my profile!</p>
+              <p id="profileLocation" class="muted" style="font-size:0.85rem; margin-top:4px;">Uganda</p>
             </div>
           </div>
-          <div class="profile-stats">
-            <div><strong id="postCount">0</strong><span>Posts</span></div>
-            <div><strong id="followerCount">0</strong><span>Followers</span></div>
-            <div><strong id="followingCount">0</strong><span>Following</span></div>
+          <button class="btn secondary" id="openEditProfileBtn">Edit Profile</button>
+        </div>
+
+        <div class="profile-stats card">
+          <div>
+            <strong id="statPostsCount">0</strong>
+            <span>Posts</span>
+          </div>
+          <div>
+            <strong>0</strong>
+            <span>Followers</span>
+          </div>
+          <div>
+            <strong>0</strong>
+            <span>Following</span>
           </div>
         </div>
+
         <h3>Your Posts</h3>
-        <div id="profileGrid" class="profile-grid"></div>
+        <div class="profile-grid" id="profileGrid">
+          <!-- Profile posts rendered here -->
+        </div>
       </section>
 
-      <!-- PLACEHOLDER PAGES -->
-      <section id="history" class="page"><div class="card page-card"><h2>History</h2><p class="muted">Your recently viewed posts will appear here.</p></div></section>
-      <section id="liked" class="page"><div class="card page-card"><h2>Liked Videos</h2><p class="muted">Your liked posts and videos will appear here.</p></div></section>
-      <section id="watch-later" class="page"><div class="card page-card"><h2>Watch Later</h2><p class="muted">Saved items will appear here.</p></div></section>
-      <section id="music" class="page"><div class="card page-card"><h2>Music</h2><p class="muted">Trending audio and music track list.</p></div></section>
+      <!-- OTHER PAGES (Placeholders) -->
+      <section id="shorts-page" class="page">
+        <div class="card page-card">
+          <h2>Shorts</h2>
+          <p class="muted">Short videos feed coming soon!</p>
+        </div>
+      </section>
+
+      <section id="subscriptions-page" class="page">
+        <div class="card page-card">
+          <h2>Subscriptions</h2>
+          <p class="muted">Channel subscriptions feed.</p>
+        </div>
+      </section>
+
+      <section id="history-page" class="page">
+        <div class="card page-card">
+          <h2>History</h2>
+          <p class="muted">Your recently viewed posts and videos.</p>
+        </div>
+      </section>
+
+      <section id="liked-page" class="page">
+        <div class="card page-card">
+          <h2>Liked Videos</h2>
+          <p class="muted">Posts and videos you have liked.</p>
+        </div>
+      </section>
+
+      <section id="watch-later-page" class="page">
+        <div class="card page-card">
+          <h2>Watch Later</h2>
+          <p class="muted">Saved items to watch later.</p>
+        </div>
+      </section>
     </main>
 
     <!-- RIGHT SIDEBAR -->
     <aside class="right-sidebar">
-      <div class="card page-card">
+      <div class="card">
         <h3>Suggested for you</h3>
-        <div id="suggestions"></div>
+        <p class="muted" style="margin-top:10px; font-size:0.85rem;">Discover creators nearby</p>
       </div>
     </aside>
   </div>
 
-  <!-- AUTH MODAL -->
-  <div id="authModal" class="modal hidden">
-    <div class="modal-content card">
-      <button id="closeAuthModal" class="modal-close">&times;</button>
-      <h2>Sign In / Switch Account</h2>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="authEmail" placeholder="email@domain.com">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="authPassword" placeholder="••••••••">
-      </div>
-      <button id="modalSignInBtn" class="btn primary">Sign In</button>
-      <div class="demo-chips">
-        <small class="muted">Quick Switch Demo Accounts:</small>
-        <div class="chips-row">
-          <span class="chip" data-user="anold">@anold.banxx</span>
-          <span class="chip" data-user="lynda">@lynda.banxx</span>
-          <span class="chip" data-user="sarah">@sarah.styles</span>
-          <span class="chip" data-user="john">@john.daily</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- EDIT PROFILE MODAL -->
-  <div id="editProfileModal" class="modal hidden">
+  <div class="modal hidden" id="editProfileModal">
     <div class="modal-content card">
-      <button id="closeEditProfileModal" class="modal-close">&times;</button>
+      <button class="modal-close" id="closeEditProfileBtn">&times;</button>
       <h2>Edit Profile</h2>
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="editFullName" placeholder="Full Name">
-      </div>
-      <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="editUsername" placeholder="Username">
-      </div>
-      <div class="form-group">
-        <label>Location</label>
-        <input type="text" id="editLocation" placeholder="Location">
-      </div>
-      <div class="form-group">
-        <label>Bio</label>
-        <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
-      </div>
-      <div class="form-group">
-        <label>Avatar Image URL</label>
-        <input type="url" id="editAvatarUrl" placeholder="https://example.com/avatar.png">
-      </div>
-      <button id="saveProfileBtn" class="btn primary">Save Changes</button>
+      <form id="editProfileForm" style="margin-top:15px;">
+        <div class="form-group">
+          <label for="editFullName">Full Name</label>
+          <input type="text" id="editFullName" placeholder="Your full name" required>
+        </div>
+        <div class="form-group">
+          <label for="editUsername">Username</label>
+          <input type="text" id="editUsername" placeholder="username" required>
+        </div>
+        <div class="form-group">
+          <label for="editLocation">Location</label>
+          <input type="text" id="editLocation" placeholder="e.g. Uganda">
+        </div>
+        <div class="form-group">
+          <label for="editBio">Bio</label>
+          <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="editAvatarFile">Profile Picture File</label>
+          <input type="file" id="editAvatarFile" accept="image/*">
+        </div>
+        <button type="submit" class="btn primary" style="width:100%; margin-top:10px;">Save Changes</button>
+      </form>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <!-- CREATE POST MODAL -->
+  <div class="modal hidden" id="createPostModal">
+    <div class="modal-content card">
+      <button class="modal-close" id="closeCreatePostBtn">&times;</button>
+      <h2>Create Post</h2>
+      <form id="createPostForm" style="margin-top:15px;">
+        <div class="form-group">
+          <label for="postContent">Caption</label>
+          <textarea id="postContent" placeholder="What's on your mind?"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="postMediaFile">Photo or Video File</label>
+          <input type="file" id="postMediaFile" accept="image/*,video/*">
+        </div>
+        <button type="submit" class="btn primary" style="width:100%; margin-top:10px;">Post</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">Message</div>
 
   <script src="app.js"></script>
 </body>
