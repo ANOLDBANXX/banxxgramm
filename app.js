@@ -62,7 +62,7 @@ let previewMedia = null;
 let sb = null;
 
 const SUPABASE_URL = "https://pniuwblnrhybnkdggbim.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_I7QNLZ09Z5z73kRijjSLug_N58b9...";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBuaXV3Ymxucmh5Ym5rZGdnYmltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTAzNzEsImV4cCI6MjEwNjA4NjM3MX0.iTfeaEeLjQqhxSbVhMS30mNJ9eg9nRtSGUxdhHFyjOc";
 
 /* =========================================================
    BANXXGRAM SUPABASE SETUP
@@ -263,6 +263,17 @@ async function signIn() {
   const result = await sb.auth.signInWithPassword({ email, password });
 
   if (result.error) {
+    // If sign in fails, automatically attempt sign up for new users
+    if (result.error.message.includes("Invalid login credentials")) {
+      const signUpResult = await sb.auth.signUp({ email, password });
+      if (signUpResult.error) {
+        toast(signUpResult.error.message);
+      } else {
+        toast("Account created! Check email or sign in.");
+        closeAuthModal();
+      }
+      return;
+    }
     toast(result.error.message);
     return;
   }
@@ -298,6 +309,7 @@ function esc(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
 function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify(posts));
@@ -305,6 +317,7 @@ function save() {
     console.warn("LocalStorage full, post saved in memory only:", err);
   }
 }
+
 function toast(message) {
   const element = document.getElementById("toast");
   if (!element) return;
