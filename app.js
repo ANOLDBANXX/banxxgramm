@@ -84,26 +84,41 @@ async function initSupabase() {
 async function loadCurrentProfile() {
   if (!sb || !currentUser) return null;
 
-  const profileResult = await sb
-    .from("profiles")
-    .select("*")
-    .eq("id", currentUser.id)
-    .single();
+  try {
+    const profileResult = await sb
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .single();
 
-  if (profileResult.error) {
-    console.error("Could not load profile:", profileResult.error);
-    currentProfile = null;
-    return null;
+    if (profileResult.error || !profileResult.data) {
+      const emailPrefix = currentUser.email ? currentUser.email.split("@")[0] : "user";
+      currentProfile = {
+        username: emailPrefix,
+        full_name: emailPrefix,
+        bio: "Welcome to my Banxxgram profile!"
+      };
+      return currentProfile;
+    }
+
+    currentProfile = profileResult.data;
+    return currentProfile;
+  } catch (e) {
+    const emailPrefix = currentUser.email ? currentUser.email.split("@")[0] : "user";
+    currentProfile = {
+      username: emailPrefix,
+      full_name: emailPrefix,
+      bio: "Welcome to my Banxxgram profile!"
+    };
+    return currentProfile;
   }
-
-  currentProfile = profileResult.data;
-  return currentProfile;
 }
 
 function getDisplayName() {
   if (demoAccount) return demoAccount.name;
   if (currentProfile?.full_name) return currentProfile.full_name;
   if (currentUser?.user_metadata?.full_name) return currentUser.user_metadata.full_name;
+  if (currentUser?.email) return currentUser.email.split("@")[0];
   return "Guest User";
 }
 
@@ -111,6 +126,7 @@ function getUsername() {
   if (demoAccount) return demoAccount.u;
   if (currentProfile?.username) return currentProfile.username;
   if (currentUser?.user_metadata?.username) return currentUser.user_metadata.username;
+  if (currentUser?.email) return currentUser.email.split("@")[0];
   return "guest";
 }
 
@@ -302,8 +318,18 @@ async function signUp() {
     return;
   }
 
-  toast("Check your email for the confirmation link!");
-  closeAuthModal();
+  if (result.data.user) {
+    currentUser = result.data.user;
+    demoAccount = null;
+    await loadCurrentProfile();
+    updateCurrentUserUI();
+    renderProfile();
+    closeAuthModal();
+    toast("Account created and signed in!");
+  } else {
+    toast("Check your email for the confirmation link!");
+    closeAuthModal();
+  }
 }
 
 async function signOut() {
