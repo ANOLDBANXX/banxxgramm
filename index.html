@@ -148,25 +148,28 @@
     </aside>
   </div>
 
-  <!-- AUTH MODAL -->
-  <div id="authModal" class="modal hidden">
-    <div class="modal-content card">
-      <span id="closeAuthModal" class="close-btn">&times;</span>
-      <h2>Sign In / Register</h2>
-      <div class="form-group">
-        <input type="email" id="authEmail" placeholder="Email address" />
-        <input type="password" id="authPassword" placeholder="Password" />
-        <button id="modalSignInBtn" class="btn primary full-width">Sign In</button>
-      </div>
-      <hr />
-      <p class="muted small">Or switch to a demo profile:</p>
-      <div class="chip-group">
-        <button class="chip" data-user="anold">@anold.banxx</button>
-        <button class="chip" data-user="sarah">@sarah.styles</button>
-        <button class="chip" data-user="john">@john.daily</button>
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-content card">
+    <span id="closeAuthModal" class="close-btn">&times;</span>
+    <h2>Sign In / Register</h2>
+    <div class="form-group">
+      <input type="email" id="authEmail" placeholder="Email address" />
+      <input type="password" id="authPassword" placeholder="Password" />
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="modalSignInBtn" class="btn primary" style="flex: 1;">Sign In</button>
+        <button id="modalSignUpBtn" class="btn secondary" style="flex: 1;">Sign Up</button>
       </div>
     </div>
+    <hr />
+    <p class="muted small">Or switch to a demo profile:</p>
+    <div class="chip-group">
+      <button class="chip" data-user="anold">@anold.banxx</button>
+      <button class="chip" data-user="sarah">@sarah.styles</button>
+      <button class="chip" data-user="john">@john.daily</button>
+    </div>
   </div>
+</div>
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="toast"></div>
