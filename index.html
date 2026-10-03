@@ -1,148 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Supabase JS Client -->
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- TOP HEADER BAR -->
-  <header class="app-header">
-    <div class="header-left">
-      <h1 class="logo">Banxxgram</h1>
-    </div>
-    <div class="header-center">
-      <div class="search-bar-wrapper">
-        <input type="text" id="globalSearch" placeholder="Search..." />
-        <button class="search-icon-btn">🔍</button>
-      </div>
-    </div>
-    <div class="header-right">
-      <button data-section="create" class="btn primary nav-create-btn">+ Create</button>
-      <button id="headerSignInBtn" class="btn secondary">Sign In</button>
-      <button id="headerSignUpBtn" class="btn primary">Sign Up</button>
-    </div>
-  </header>
-
-  <!-- MAIN APP CONTAINER -->
-  <div class="app-container">
-    <!-- SIDEBAR NAVIGATION (YOUTUBE / SHORTS STRUCTURE) -->
+  <div class="app-layout">
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="user-profile-summary">
-        <div class="avatar" id="sideAvatar">GU</div>
-        <div class="user-details">
+      <div class="brand">Banxxgram</div>
+      
+      <div class="user-card card">
+        <div class="avatar lg" id="sideAvatar">GU</div>
+        <div class="user-info">
           <strong id="sideDisplayName">Guest User</strong>
-          <small id="sideUsername">@guest</small>
+          <small id="sideUsername" class="muted">@guest</small>
         </div>
       </div>
 
       <nav class="nav-menu">
-        <!-- MAIN SECTION -->
-        <div class="nav-section">
-          <button data-section="home" class="nav-btn active">
-            <span class="nav-icon">🏠</span> <span class="nav-text">Home</span>
-          </button>
-          <button data-section="home" class="nav-btn">
-            <span class="nav-icon">⚡</span> <span class="nav-text">Shorts</span>
-          </button>
-          <button data-section="home" class="nav-btn">
-            <span class="nav-icon">👥</span> <span class="nav-text">Subscriptions</span>
-          </button>
-        </div>
+        <button class="nav-item active" data-section="home">
+          <span class="icon">⛺</span> Home
+        </button>
+        <button class="nav-item" data-section="create">
+          <span class="icon">⚡</span> Shorts
+        </button>
+        <button class="nav-item" data-section="search">
+          <span class="icon">👥</span> Subscriptions
+        </button>
+      </nav>
 
-        <hr class="nav-divider" />
+      <div class="nav-divider">You ›</div>
+      
+      <nav class="nav-menu">
+        <button class="nav-item" data-section="profile">
+          <span class="icon">👤</span> Profile
+        </button>
+        <button class="nav-item" data-section="history">
+          <span class="icon">🕒</span> History
+        </button>
+        <button class="nav-item" data-section="liked">
+          <span class="icon">♥</span> Liked Videos
+        </button>
+        <button class="nav-item" data-section="watch-later">
+          <span class="icon">🏷️</span> Watch Later
+        </button>
+      </nav>
 
-        <!-- YOU SECTION -->
-        <div class="nav-section">
-          <div class="nav-section-title">You <span>›</span></div>
-          <button data-section="profile" class="nav-btn">
-            <span class="nav-icon">👤</span> <span class="nav-text">Profile</span>
-          </button>
-          <button data-section="home" class="nav-btn">
-            <span class="nav-icon">🕒</span> <span class="nav-text">History</span>
-          </button>
-          <button data-section="home" class="nav-btn">
-            <span class="nav-icon">❤️</span> <span class="nav-text">Liked Videos</span>
-          </button>
-          <button data-section="home" class="nav-btn">
-            <span class="nav-icon">🔖</span> <span class="nav-text">Watch Later</span>
-          </button>
-        </div>
-
-        <hr class="nav-divider" />
-
-        <!-- EXPLORE SECTION -->
-        <div class="nav-section">
-          <div class="nav-section-title">Explore</div>
-          <button data-section="search" class="nav-btn">
-            <span class="nav-icon">🔍</span> <span class="nav-text">Search</span>
-          </button>
-          <button data-section="search" class="nav-btn">
-            <span class="nav-icon">🎵</span> <span class="nav-text">Music</span>
-          </button>
-          <button data-section="search" class="nav-btn">
-            <span class="nav-icon">🎬</span> <span class="nav-text">Films</span>
-          </button>
-        </div>
+      <div class="nav-divider">Explore</div>
+      
+      <nav class="nav-menu">
+        <button class="nav-item" data-section="search">
+          <span class="icon">🔍</span> Search
+        </button>
+        <button class="nav-item" data-section="music">
+          <span class="icon">🎵</span> Music
+        </button>
       </nav>
     </aside>
 
-    <!-- CONTENT PAGES -->
+    <!-- MAIN CONTENT -->
     <main class="main-content">
+      <!-- HEADER -->
+      <header class="top-header">
+        <div class="search-bar">
+          <input type="text" id="globalSearch" placeholder="Search...">
+          <span class="search-icon">🔍</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn primary" data-section="create">+ Create</button>
+          <button class="btn secondary" id="headerSignInBtn">Switch Account</button>
+          <button class="btn primary" id="headerSignUpBtn">Log Out</button>
+        </div>
+      </header>
+
       <!-- HOME PAGE -->
       <section id="home" class="page active">
-        <div id="stories" class="stories-bar"></div>
+        <div id="stories" class="stories-container"></div>
         <div id="feed" class="feed-container"></div>
-      </section>
-
-      <!-- SEARCH PAGE -->
-      <section id="search" class="page">
-        <div class="card page-card">
-          <h2>Search Accounts</h2>
-          <input type="text" id="searchInput" placeholder="Search by username..." />
-          <div id="results" class="results empty">Start typing to search.</div>
-        </div>
       </section>
 
       <!-- CREATE POST PAGE -->
       <section id="create" class="page">
         <div class="card page-card">
           <h2>Create New Post</h2>
-          <textarea id="postText" placeholder="What's on your mind?" rows="4"></textarea>
-          <div class="file-input-wrapper">
-            <input type="file" id="postImage" accept="image/*,video/*" />
-            <div id="imagePreview" class="image-preview">No file selected</div>
+          <div class="form-group">
+            <textarea id="postText" placeholder="What's on your mind?"></textarea>
           </div>
-          <button id="publishBtn" class="btn primary full-width">Publish Post</button>
+          <div class="form-group">
+            <label for="postImage" class="btn secondary">Choose File</label>
+            <input type="file" id="postImage" accept="image/*,video/*" style="display:none;">
+            <div id="imagePreview" class="preview-box">No file selected</div>
+          </div>
+          <button id="publishBtn" class="btn primary">Publish Post</button>
+        </div>
+      </section>
+
+      <!-- SEARCH PAGE -->
+      <section id="search" class="page">
+        <div class="card page-card">
+          <h2>Search Profiles</h2>
+          <input type="text" id="searchInput" placeholder="Type username to search...">
+          <div id="results" class="results empty">Start typing to search.</div>
         </div>
       </section>
 
       <!-- PROFILE PAGE -->
       <section id="profile" class="page">
-        <<!-- PROFILE PAGE -->
-      <section id="profile" class="page">
         <div class="card page-card profile-header-card">
-          <div class="profile-main">
-            <div class="avatar xl" id="profileAvatar">GU</div>
-            <div>
-              <h2 id="profileUsername">@guest</h2>
-              <p id="profileBio" class="muted">No bio added yet.</p>
-              <!-- EDIT PROFILE BUTTON -->
-              <button id="openEditProfileBtn" class="btn secondary" style="margin-top: 10px; display: inline-block;">Edit Profile</button>
-            </div>
-          </div>
-          <div class="profile-stats">
-            <div><strong id="postCount">0</strong><span>Posts</span></div>
-            <div><strong id="followerCount">0</strong><span>Followers</span></div>
-            <div><strong id="followingCount">0</strong><span>Following</span></div>
-          </div>
-        </div>
-        <h3>Your Posts</h3>
-        <div id="profileGrid" class="profile-grid"></div>
-      </section>div class="card page-card profile-header-card">
           <div class="profile-main">
             <div class="avatar xl" id="profileAvatar">GU</div>
             <div>
@@ -160,34 +128,45 @@
         <h3>Your Posts</h3>
         <div id="profileGrid" class="profile-grid"></div>
       </section>
+
+      <!-- PLACEHOLDER PAGES -->
+      <section id="history" class="page"><div class="card page-card"><h2>History</h2><p class="muted">Your recently viewed posts will appear here.</p></div></section>
+      <section id="liked" class="page"><div class="card page-card"><h2>Liked Videos</h2><p class="muted">Your liked posts and videos will appear here.</p></div></section>
+      <section id="watch-later" class="page"><div class="card page-card"><h2>Watch Later</h2><p class="muted">Saved items will appear here.</p></div></section>
+      <section id="music" class="page"><div class="card page-card"><h2>Music</h2><p class="muted">Trending audio and music track list.</p></div></section>
     </main>
 
-    <!-- RIGHT SIDEBAR (SUGGESTIONS) -->
+    <!-- RIGHT SIDEBAR -->
     <aside class="right-sidebar">
-      <h3>Suggested for you</h3>
-      <div id="suggestions" class="suggestions-list"></div>
+      <div class="card page-card">
+        <h3>Suggested for you</h3>
+        <div id="suggestions"></div>
+      </div>
     </aside>
   </div>
 
   <!-- AUTH MODAL -->
   <div id="authModal" class="modal hidden">
     <div class="modal-content card">
-      <span id="closeAuthModal" class="close-btn">&times;</span>
-      <h2>Sign In / Register</h2>
+      <button id="closeAuthModal" class="modal-close">&times;</button>
+      <h2>Sign In / Switch Account</h2>
       <div class="form-group">
-        <input type="email" id="authEmail" placeholder="Email address" />
-        <input type="password" id="authPassword" placeholder="Password" />
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-          <button id="modalSignInBtn" class="btn primary" style="flex: 1;">Sign In</button>
-          <button id="modalSignUpBtn" class="btn secondary" style="flex: 1;">Sign Up</button>
-        </div>
+        <label>Email</label>
+        <input type="email" id="authEmail" placeholder="email@domain.com">
       </div>
-      <hr />
-      <p class="muted small">Or switch to a demo profile:</p>
-      <div class="chip-group">
-        <button class="chip" data-user="anold">@anold.banxx</button>
-        <button class="chip" data-user="sarah">@sarah.styles</button>
-        <button class="chip" data-user="john">@john.daily</button>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="••••••••">
+      </div>
+      <button id="modalSignInBtn" class="btn primary">Sign In</button>
+      <div class="demo-chips">
+        <small class="muted">Quick Switch Demo Accounts:</small>
+        <div class="chips-row">
+          <span class="chip" data-user="anold">@anold.banxx</span>
+          <span class="chip" data-user="lynda">@lynda.banxx</span>
+          <span class="chip" data-user="sarah">@sarah.styles</span>
+          <span class="chip" data-user="john">@john.daily</span>
+        </div>
       </div>
     </div>
   </div>
@@ -195,30 +174,32 @@
   <!-- EDIT PROFILE MODAL -->
   <div id="editProfileModal" class="modal hidden">
     <div class="modal-content card">
-      <span id="closeEditProfileModal" class="close-btn">&times;</span>
+      <button id="closeEditProfileModal" class="modal-close">&times;</button>
       <h2>Edit Profile</h2>
       <div class="form-group">
-        <label for="editFullName">Full Name</label>
-        <input type="text" id="editFullName" placeholder="e.g. Anold Banxx" />
-        
-        <label for="editUsername">Username</label>
-        <input type="text" id="editUsername" placeholder="e.g. anold.banxx" />
-
-        <label for="editLocation">Location</label>
-        <input type="text" id="editLocation" placeholder="e.g. Kampala, Uganda" />
-
-        <label for="editBio">Bio</label>
-        <input type="text" id="editBio" placeholder="Tell us about yourself..." />
-
-        <label for="editAvatarUrl">Avatar Image URL</label>
-        <input type="text" id="editAvatarUrl" placeholder="https://..." />
-
-        <button id="saveProfileBtn" class="btn primary" style="margin-top: 15px; width: 100%;">Save Changes</button>
+        <label>Full Name</label>
+        <input type="text" id="editFullName" placeholder="Full Name">
       </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="editUsername" placeholder="Username">
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" id="editLocation" placeholder="Location">
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Avatar Image URL</label>
+        <input type="url" id="editAvatarUrl" placeholder="https://example.com/avatar.png">
+      </div>
+      <button id="saveProfileBtn" class="btn primary">Save Changes</button>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
   <div id="toast" class="toast"></div>
 
   <script src="app.js"></script>
