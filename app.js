@@ -94,9 +94,12 @@ async function loadCurrentProfile() {
     if (profileResult.error || !profileResult.data) {
       const emailPrefix = currentUser.email ? currentUser.email.split("@")[0] : "user";
       currentProfile = {
+        id: currentUser.id,
         username: emailPrefix,
         full_name: emailPrefix,
-        bio: "Welcome to my Banxxgram profile!"
+        bio: "Welcome to my Banxxgram profile!",
+        location: "Uganda",
+        avatar_url: ""
       };
       return currentProfile;
     }
@@ -106,9 +109,12 @@ async function loadCurrentProfile() {
   } catch (e) {
     const emailPrefix = currentUser.email ? currentUser.email.split("@")[0] : "user";
     currentProfile = {
+      id: currentUser.id,
       username: emailPrefix,
       full_name: emailPrefix,
-      bio: "Welcome to my Banxxgram profile!"
+      bio: "Welcome to my Banxxgram profile!",
+      location: "Uganda",
+      avatar_url: ""
     };
     return currentProfile;
   }
@@ -166,12 +172,22 @@ function updateCurrentUserUI() {
 
   if (sideAvatar) {
     sideAvatar.textContent = initials;
-    sideAvatar.style.backgroundImage = currentProfile?.avatar_url ? `url("${currentProfile.avatar_url}")` : "";
+    if (currentProfile?.avatar_url) {
+      sideAvatar.style.backgroundImage = `url("${currentProfile.avatar_url}")`;
+      sideAvatar.style.backgroundSize = "cover";
+    } else {
+      sideAvatar.style.backgroundImage = "";
+    }
   }
 
   if (profileAvatar) {
     profileAvatar.textContent = initials;
-    profileAvatar.style.backgroundImage = currentProfile?.avatar_url ? `url("${currentProfile.avatar_url}")` : "";
+    if (currentProfile?.avatar_url) {
+      profileAvatar.style.backgroundImage = `url("${currentProfile.avatar_url}")`;
+      profileAvatar.style.backgroundSize = "cover";
+    } else {
+      profileAvatar.style.backgroundImage = "";
+    }
   }
 
   const headerSignInBtn = document.getElementById("headerSignInBtn");
@@ -218,16 +234,96 @@ function closeAuthModal() {
   if (modal) modal.classList.add("hidden");
 }
 
+function openEditProfileModal() {
+  if (!currentUser && !demoAccount) {
+    toast("Please sign in to edit your profile.");
+    return;
+  }
+
+  const modal = document.getElementById("editProfileModal");
+  if (!modal) return;
+
+  const editFullName = document.getElementById("editFullName");
+  const editUsername = document.getElementById("editUsername");
+  const editLocation = document.getElementById("editLocation");
+  const editBio = document.getElementById("editBio");
+  const editAvatarUrl = document.getElementById("editAvatarUrl");
+
+  if (editFullName) editFullName.value = currentProfile?.full_name || getDisplayName();
+  if (editUsername) editUsername.value = currentProfile?.username || getUsername();
+  if (editLocation) editLocation.value = currentProfile?.location || "";
+  if (editBio) editBio.value = currentProfile?.bio || "";
+  if (editAvatarUrl) editAvatarUrl.value = currentProfile?.avatar_url || "";
+
+  modal.classList.remove("hidden");
+}
+
+function closeEditProfileModal() {
+  const modal = document.getElementById("editProfileModal");
+  if (modal) modal.classList.add("hidden");
+}
+
+async function saveProfile() {
+  const fullName = document.getElementById("editFullName")?.value.trim();
+  const username = document.getElementById("editUsername")?.value.trim();
+  const location = document.getElementById("editLocation")?.value.trim();
+  const bio = document.getElementById("editBio")?.value.trim();
+  const avatarUrl = document.getElementById("editAvatarUrl")?.value.trim();
+
+  if (demoAccount) {
+    demoAccount.name = fullName || demoAccount.name;
+    demoAccount.u = username || demoAccount.u;
+    demoAccount.l = location || demoAccount.l;
+    updateCurrentUserUI();
+    closeEditProfileModal();
+    toast("Demo profile updated!");
+    return;
+  }
+
+  if (!sb || !currentUser) {
+    toast("Not signed in.");
+    return;
+  }
+
+  const updates = {
+    id: currentUser.id,
+    full_name: fullName,
+    username: username,
+    location: location,
+    bio: bio,
+    avatar_url: avatarUrl,
+    updated_at: new Date()
+  };
+
+  const { error } = await sb.from("profiles").upsert(updates);
+
+  if (error) {
+    toast("Failed to update profile: " + error.message);
+    return;
+  }
+
+  currentProfile = { ...currentProfile, ...updates };
+  updateCurrentUserUI();
+  renderProfile();
+  closeEditProfileModal();
+  toast("Profile updated successfully!");
+}
+
 function setupModalEvents() {
   const closeBtn = document.getElementById("closeAuthModal");
+  const closeEditBtn = document.getElementById("closeEditProfileModal");
   const headerSignInBtn = document.getElementById("headerSignInBtn");
   const headerSignUpBtn = document.getElementById("headerSignUpBtn");
   const modalSignInBtn = document.getElementById("modalSignInBtn");
   const modalSignUpBtn = document.getElementById("modalSignUpBtn");
+  const openEditProfileBtn = document.getElementById("openEditProfileBtn");
+  const saveProfileBtn = document.getElementById("saveProfileBtn");
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closeAuthModal);
-  }
+  if (closeBtn) closeBtn.addEventListener("click", closeAuthModal);
+  if (closeEditBtn) closeEditBtn.addEventListener("click", closeEditProfileModal);
+
+  if (openEditProfileBtn) openEditProfileBtn.addEventListener("click", openEditProfileModal);
+  if (saveProfileBtn) saveProfileBtn.addEventListener("click", saveProfile);
 
   if (headerSignInBtn) {
     headerSignInBtn.addEventListener("click", () => openAuthModal());
@@ -243,13 +339,8 @@ function setupModalEvents() {
     });
   }
 
-  if (modalSignInBtn) {
-    modalSignInBtn.addEventListener("click", signIn);
-  }
-
-  if (modalSignUpBtn) {
-    modalSignUpBtn.addEventListener("click", signUp);
-  }
+  if (modalSignInBtn) modalSignInBtn.addEventListener("click", signIn);
+  if (modalSignUpBtn) modalSignUpBtn.addEventListener("click", signUp);
 
   document.querySelectorAll(".chip[data-user]").forEach(chip => {
     chip.addEventListener("click", () => {
@@ -325,7 +416,8 @@ async function signUp() {
     updateCurrentUserUI();
     renderProfile();
     closeAuthModal();
-    toast("Account created and signed in!");
+    openEditProfileModal(); // Auto-prompt setup upon signup
+    toast("Account created! Set up your profile now.");
   } else {
     toast("Check your email for the confirmation link!");
     closeAuthModal();
@@ -343,7 +435,7 @@ async function signOut() {
 }
 
 /* =========================================================
-   UTILITIES
+   UTILITIES & DOM RENDERING
    ========================================================= */
 
 function esc(value) {
@@ -385,10 +477,6 @@ function showSection(section) {
     button.classList.toggle("active", button.dataset.section === section);
   });
 }
-
-/* =========================================================
-   DOM RENDERING & NAVIGATION
-   ========================================================= */
 
 document.querySelectorAll("[data-section]").forEach(button => {
   button.addEventListener("click", () => showSection(button.dataset.section));
