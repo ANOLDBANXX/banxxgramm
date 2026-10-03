@@ -207,6 +207,7 @@ function setupModalEvents() {
   const headerSignInBtn = document.getElementById("headerSignInBtn");
   const headerSignUpBtn = document.getElementById("headerSignUpBtn");
   const modalSignInBtn = document.getElementById("modalSignInBtn");
+  const modalSignUpBtn = document.getElementById("modalSignUpBtn");
 
   if (closeBtn) {
     closeBtn.addEventListener("click", closeAuthModal);
@@ -228,6 +229,10 @@ function setupModalEvents() {
 
   if (modalSignInBtn) {
     modalSignInBtn.addEventListener("click", signIn);
+  }
+
+  if (modalSignUpBtn) {
+    modalSignUpBtn.addEventListener("click", signUp);
   }
 
   document.querySelectorAll(".chip[data-user]").forEach(chip => {
@@ -263,17 +268,6 @@ async function signIn() {
   const result = await sb.auth.signInWithPassword({ email, password });
 
   if (result.error) {
-    // If sign in fails, automatically attempt sign up for new users
-    if (result.error.message.includes("Invalid login credentials")) {
-      const signUpResult = await sb.auth.signUp({ email, password });
-      if (signUpResult.error) {
-        toast(signUpResult.error.message);
-      } else {
-        toast("Account created! Check email or sign in.");
-        closeAuthModal();
-      }
-      return;
-    }
     toast(result.error.message);
     return;
   }
@@ -285,6 +279,31 @@ async function signIn() {
   renderProfile();
   closeAuthModal();
   toast("Welcome back!");
+}
+
+async function signUp() {
+  if (!sb) {
+    toast("Supabase is not connected.");
+    return;
+  }
+
+  const email = document.getElementById("authEmail")?.value.trim();
+  const password = document.getElementById("authPassword")?.value;
+
+  if (!email || !password) {
+    toast("Enter an email and password to sign up.");
+    return;
+  }
+
+  const result = await sb.auth.signUp({ email, password });
+
+  if (result.error) {
+    toast(result.error.message);
+    return;
+  }
+
+  toast("Check your email for the confirmation link!");
+  closeAuthModal();
 }
 
 async function signOut() {
