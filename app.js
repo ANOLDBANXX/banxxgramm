@@ -298,11 +298,13 @@ function esc(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 function save() {
-  localStorage.setItem(KEY, JSON.stringify(posts));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(posts));
+  } catch (err) {
+    console.warn("LocalStorage full, post saved in memory only:", err);
+  }
 }
-
 function toast(message) {
   const element = document.getElementById("toast");
   if (!element) return;
