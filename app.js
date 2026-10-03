@@ -61,8 +61,7 @@ let demoAccount = null;
    BANXXGRAM SUPABASE SETUP
    ========================================================= */
 
-const SUPABASE_URL = "https://eeoyocbchcgxiafugyrx.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_YoDt1uYphw89Ri83UGkY-A_wV04ti33";
+
 let sb = null;
 
 async function initSupabase() {
