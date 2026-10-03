@@ -9,15 +9,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <!-- HEADER -->
+  <!-- TOP HEADER BAR -->
   <header class="app-header">
     <div class="header-left">
       <h1 class="logo">Banxxgram</h1>
     </div>
     <div class="header-center">
-      <input type="text" id="globalSearch" placeholder="Search..." />
+      <div class="search-bar-wrapper">
+        <input type="text" id="globalSearch" placeholder="Search..." />
+        <button class="search-icon-btn">🔍</button>
+      </div>
     </div>
     <div class="header-right">
+      <button data-section="create" class="btn primary nav-create-btn">+ Create</button>
       <button id="headerSignInBtn" class="btn secondary">Sign In</button>
       <button id="headerSignUpBtn" class="btn primary">Sign Up</button>
     </div>
@@ -25,7 +29,7 @@
 
   <!-- MAIN APP CONTAINER -->
   <div class="app-container">
-    <!-- SIDEBAR NAVIGATION -->
+    <!-- SIDEBAR NAVIGATION (YOUTUBE / SHORTS STRUCTURE) -->
     <aside class="sidebar">
       <div class="user-profile-summary">
         <div class="avatar" id="sideAvatar">GU</div>
@@ -34,11 +38,55 @@
           <small id="sideUsername">@guest</small>
         </div>
       </div>
+
       <nav class="nav-menu">
-        <button data-section="home" class="nav-btn active">🏠 Home</button>
-        <button data-section="search" class="nav-btn">🔍 Search</button>
-        <button data-section="create" class="nav-btn">➕ Create Post</button>
-        <button data-section="profile" class="nav-btn">👤 Profile</button>
+        <!-- MAIN SECTION -->
+        <div class="nav-section">
+          <button data-section="home" class="nav-btn active">
+            <span class="nav-icon">🏠</span> <span class="nav-text">Home</span>
+          </button>
+          <button data-section="home" class="nav-btn">
+            <span class="nav-icon">⚡</span> <span class="nav-text">Shorts</span>
+          </button>
+          <button data-section="home" class="nav-btn">
+            <span class="nav-icon">👥</span> <span class="nav-text">Subscriptions</span>
+          </button>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <!-- YOU SECTION -->
+        <div class="nav-section">
+          <div class="nav-section-title">You <span>›</span></div>
+          <button data-section="profile" class="nav-btn">
+            <span class="nav-icon">👤</span> <span class="nav-text">Profile</span>
+          </button>
+          <button data-section="home" class="nav-btn">
+            <span class="nav-icon">🕒</span> <span class="nav-text">History</span>
+          </button>
+          <button data-section="home" class="nav-btn">
+            <span class="nav-icon">❤️</span> <span class="nav-text">Liked Videos</span>
+          </button>
+          <button data-section="home" class="nav-btn">
+            <span class="nav-icon">🔖</span> <span class="nav-text">Watch Later</span>
+          </button>
+        </div>
+
+        <hr class="nav-divider" />
+
+        <!-- EXPLORE SECTION -->
+        <div class="nav-section">
+          <div class="nav-section-title">Explore</div>
+          <button data-section="search" class="nav-btn">
+            <span class="nav-icon">🔍</span> <span class="nav-text">Search</span>
+          </button>
+          <button data-section="search" class="nav-btn">
+            <span class="nav-icon">🎵</span> <span class="nav-text">Music</span>
+          </button>
+          <button data-section="search" class="nav-btn">
+            <span class="nav-icon">🎬</span> <span class="nav-text">Films</span>
+          </button>
+        </div>
       </nav>
     </aside>
 
