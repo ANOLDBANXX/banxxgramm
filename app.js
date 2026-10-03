@@ -51,22 +51,19 @@ const demo = [
   }
 ];
 
-/* =========================================================
-   GLOBAL STATE DECLARATIONS
-   ========================================================= */
 let posts = JSON.parse(localStorage.getItem(KEY) || "null") || demo;
 let currentUser = null;
-let currentProfile = null;
-let demoAccount = null;
 let previewMedia = null;
-let sb = null;
-
 const SUPABASE_URL = "https://pniuwblnrhybnkdggbim.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBuaXV3Ymxucmh5Ym5rZGdnYmltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MTAzNzEsImV4cCI6MjEwNjA4NjM3MX0.iTfeaEeLjQqhxSbVhMS30mNJ9eg9nRtSGUxdhHFyjOc";
+let currentProfile = null;
+let demoAccount = null;
 
 /* =========================================================
    BANXXGRAM SUPABASE SETUP
    ========================================================= */
+
+let sb = null;
 
 async function initSupabase() {
   if (!window.supabase) {
@@ -315,7 +312,6 @@ function setupModalEvents() {
   const headerSignInBtn = document.getElementById("headerSignInBtn");
   const headerSignUpBtn = document.getElementById("headerSignUpBtn");
   const modalSignInBtn = document.getElementById("modalSignInBtn");
-  const modalSignUpBtn = document.getElementById("modalSignUpBtn");
   const openEditProfileBtn = document.getElementById("openEditProfileBtn");
   const saveProfileBtn = document.getElementById("saveProfileBtn");
 
@@ -340,7 +336,6 @@ function setupModalEvents() {
   }
 
   if (modalSignInBtn) modalSignInBtn.addEventListener("click", signIn);
-  if (modalSignUpBtn) modalSignUpBtn.addEventListener("click", signUp);
 
   document.querySelectorAll(".chip[data-user]").forEach(chip => {
     chip.addEventListener("click", () => {
@@ -388,42 +383,6 @@ async function signIn() {
   toast("Welcome back!");
 }
 
-async function signUp() {
-  if (!sb) {
-    toast("Supabase is not connected.");
-    return;
-  }
-
-  const email = document.getElementById("authEmail")?.value.trim();
-  const password = document.getElementById("authPassword")?.value;
-
-  if (!email || !password) {
-    toast("Enter an email and password to sign up.");
-    return;
-  }
-
-  const result = await sb.auth.signUp({ email, password });
-
-  if (result.error) {
-    toast(result.error.message);
-    return;
-  }
-
-  if (result.data.user) {
-    currentUser = result.data.user;
-    demoAccount = null;
-    await loadCurrentProfile();
-    updateCurrentUserUI();
-    renderProfile();
-    closeAuthModal();
-    openEditProfileModal(); // Auto-prompt setup upon signup
-    toast("Account created! Set up your profile now.");
-  } else {
-    toast("Check your email for the confirmation link!");
-    closeAuthModal();
-  }
-}
-
 async function signOut() {
   if (sb && currentUser) {
     await sb.auth.signOut();
@@ -435,7 +394,7 @@ async function signOut() {
 }
 
 /* =========================================================
-   UTILITIES & DOM RENDERING
+   UTILITIES
    ========================================================= */
 
 function esc(value) {
@@ -448,11 +407,7 @@ function esc(value) {
 }
 
 function save() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(posts));
-  } catch (err) {
-    console.warn("LocalStorage full, post saved in memory only:", err);
-  }
+  localStorage.setItem(KEY, JSON.stringify(posts));
 }
 
 function toast(message) {
@@ -477,6 +432,10 @@ function showSection(section) {
     button.classList.toggle("active", button.dataset.section === section);
   });
 }
+
+/* =========================================================
+   DOM RENDERING & NAVIGATION
+   ========================================================= */
 
 document.querySelectorAll("[data-section]").forEach(button => {
   button.addEventListener("click", () => showSection(button.dataset.section));
