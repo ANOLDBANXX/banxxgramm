@@ -128,6 +128,7 @@
             <div>
               <h2 id="profileUsername">@guest</h2>
               <p id="profileBio" class="muted">No bio added yet.</p>
+              <button id="openEditProfileBtn" class="btn secondary" style="margin-top: 10px;">Edit Profile</button>
             </div>
           </div>
           <div class="profile-stats">
@@ -148,28 +149,54 @@
     </aside>
   </div>
 
-<!-- AUTH MODAL -->
-<div id="authModal" class="modal hidden">
-  <div class="modal-content card">
-    <span id="closeAuthModal" class="close-btn">&times;</span>
-    <h2>Sign In / Register</h2>
-    <div class="form-group">
-      <input type="email" id="authEmail" placeholder="Email address" />
-      <input type="password" id="authPassword" placeholder="Password" />
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button id="modalSignInBtn" class="btn primary" style="flex: 1;">Sign In</button>
-        <button id="modalSignUpBtn" class="btn secondary" style="flex: 1;">Sign Up</button>
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="modal hidden">
+    <div class="modal-content card">
+      <span id="closeAuthModal" class="close-btn">&times;</span>
+      <h2>Sign In / Register</h2>
+      <div class="form-group">
+        <input type="email" id="authEmail" placeholder="Email address" />
+        <input type="password" id="authPassword" placeholder="Password" />
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button id="modalSignInBtn" class="btn primary" style="flex: 1;">Sign In</button>
+          <button id="modalSignUpBtn" class="btn secondary" style="flex: 1;">Sign Up</button>
+        </div>
+      </div>
+      <hr />
+      <p class="muted small">Or switch to a demo profile:</p>
+      <div class="chip-group">
+        <button class="chip" data-user="anold">@anold.banxx</button>
+        <button class="chip" data-user="sarah">@sarah.styles</button>
+        <button class="chip" data-user="john">@john.daily</button>
       </div>
     </div>
-    <hr />
-    <p class="muted small">Or switch to a demo profile:</p>
-    <div class="chip-group">
-      <button class="chip" data-user="anold">@anold.banxx</button>
-      <button class="chip" data-user="sarah">@sarah.styles</button>
-      <button class="chip" data-user="john">@john.daily</button>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="editProfileModal" class="modal hidden">
+    <div class="modal-content card">
+      <span id="closeEditProfileModal" class="close-btn">&times;</span>
+      <h2>Edit Profile</h2>
+      <div class="form-group">
+        <label for="editFullName">Full Name</label>
+        <input type="text" id="editFullName" placeholder="e.g. Anold Banxx" />
+        
+        <label for="editUsername">Username</label>
+        <input type="text" id="editUsername" placeholder="e.g. anold.banxx" />
+
+        <label for="editLocation">Location</label>
+        <input type="text" id="editLocation" placeholder="e.g. Kampala, Uganda" />
+
+        <label for="editBio">Bio</label>
+        <input type="text" id="editBio" placeholder="Tell us about yourself..." />
+
+        <label for="editAvatarUrl">Avatar Image URL</label>
+        <input type="text" id="editAvatarUrl" placeholder="https://..." />
+
+        <button id="saveProfileBtn" class="btn primary" style="margin-top: 15px; width: 100%;">Save Changes</button>
+      </div>
     </div>
   </div>
-</div>
 
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="toast"></div>
