@@ -5,212 +5,286 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <div class="app-layout">
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar">
-      <div class="brand">Banxxgram</div>
+  <!-- TOP NAVBAR -->
+  <header class="top-navbar">
+    <div class="brand-container">
+      <div class="brand-logo-icon">📷</div>
+      <h1 class="brand-title">Banxxgram</h1>
+    </div>
 
-      <div class="user-card" id="sidebarUserCard">
-        <div class="avatar" id="sidebarAvatar">U</div>
-        <div class="user-info">
-          <strong id="sidebarFullName">User Name</strong>
-          <small id="sidebarUsername">@username</small>
-        </div>
+    <div class="nav-search-bar">
+      <span class="search-icon-inside">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search users, posts or hashtags...">
+    </div>
+
+    <div class="top-nav-actions">
+      <button class="top-nav-btn active nav-item" data-page="home-page">🏠 Home</button>
+      <button class="top-nav-btn nav-item" data-page="search-page">🔍 Search</button>
+      <button class="top-nav-btn" id="openCreatePostBtn">+ Create</button>
+      <button class="top-nav-btn nav-item" data-page="profile-page">👤 Profile</button>
+      <button class="top-nav-btn btn-sign-in" id="switchAccountBtn">Sign In</button>
+      <button class="top-nav-btn btn-sign-up" id="logoutBtn">Sign Up</button>
+    </div>
+  </header>
+
+  <!-- APP CONTAINER -->
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="left-sidebar">
+      <div class="user-profile-summary">
+        <div class="avatar-orange-gradient" id="sidebarAvatar">B</div>
       </div>
 
-      <nav class="nav-menu">
-        <button class="nav-item active" data-page="home-page">
-          <span class="icon">🏠</span> Home
+      <nav class="sidebar-menu">
+        <button class="sidebar-btn active nav-item" data-page="home-page">
+          <span>🏠</span> Home
         </button>
-        <button class="nav-item" data-page="shorts-page">
-          <span class="icon">⚡</span> Shorts
+        <button class="sidebar-btn nav-item" data-page="search-page">
+          <span>🔍</span> Search
         </button>
-        <button class="nav-item" data-page="subscriptions-page">
-          <span class="icon">📹</span> Subscriptions
+        <button class="sidebar-btn" id="sidebarCreateBtn">
+          <span>➕</span> Create Post
         </button>
-
-        <div class="nav-divider">You ›</div>
-
-        <button class="nav-item" data-page="profile-page">
-          <span class="icon">👤</span> Profile
-        </button>
-        <button class="nav-item" data-page="history-page">
-          <span class="icon">🕒</span> History
-        </button>
-        <button class="nav-item" data-page="liked-page">
-          <span class="icon">♥</span> Liked Videos
-        </button>
-        <button class="nav-item" data-page="watch-later-page">
-          <span class="icon">🏷️</span> Watch Later
+        <button class="sidebar-btn nav-item" data-page="profile-page">
+          <span>👤</span> Profile
         </button>
       </nav>
+
+      <div class="sidebar-footer">
+        <strong>BANXXGRAM</strong>
+        <p>Share • Connect • Be You.</p>
+      </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
-    <main class="main-content">
-      <!-- TOP HEADER -->
-      <header class="top-header">
-        <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Search...">
-          <span class="search-icon">🔍</span>
-        </div>
-        <div class="header-actions">
-          <button class="btn primary" id="openCreatePostBtn">+ Create</button>
-          <button class="btn secondary" id="switchAccountBtn">Switch Account</button>
-          <button class="btn secondary" id="logoutBtn">Log Out</button>
-        </div>
-      </header>
-
+    <!-- MAIN FEED AREA -->
+    <main class="main-feed-area">
+      
       <!-- HOME PAGE -->
       <section id="home-page" class="page active">
-        <div class="stories-container" id="storiesContainer">
-          <div class="story">
-            <div class="avatar" id="yourStoryAvatar">U</div>
-            <span>Your story</span>
+        
+        <!-- CREATE POST INPUT CARD -->
+        <div class="create-post-card">
+          <div class="create-post-top">
+            <div class="avatar-sm" id="createPostAvatar">B</div>
+            <input type="text" id="inlinePostContent" placeholder="What's on your mind?">
+          </div>
+          <div class="create-post-bottom">
+            <div class="attach-media-options">
+              <span class="attach-option">🖼️ Photo</span>
+              <span class="attach-option">🎥 Video</span>
+              <span class="attach-option">👤 Tag</span>
+            </div>
+            <button class="btn-orange-post" id="inlinePostBtn">🚀 Post</button>
           </div>
         </div>
-        <div class="feed-container" id="feedContainer">
-          <!-- Posts rendered dynamically -->
+
+        <!-- DYNAMIC FEED -->
+        <div id="feedContainer" style="display:flex; flex-direction:column; gap:20px;">
+          
+          <!-- Sample Card 1 matching target UI -->
+          <div class="feed-post-card">
+            <div class="post-card-header">
+              <div class="post-author-info">
+                <div class="avatar-sm">LB</div>
+                <div class="author-names">
+                  <strong>@llynda.banxx</strong>
+                  <small>Kampala, Uganda</small>
+                </div>
+              </div>
+              <span class="post-more-options">•••</span>
+            </div>
+            <p class="post-caption-text">Good vibes only ☀️</p>
+            <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1000" class="post-image-preview" alt="City Sunset">
+            <div class="post-action-bar">
+              <div class="left-actions">
+                <span class="action-item">♥ 24</span>
+                <span class="action-item">💬 2</span>
+                <span class="action-item">✈️</span>
+              </div>
+              <span class="action-item">🔖</span>
+            </div>
+          </div>
+
+          <!-- Sample Card 2 matching target UI -->
+          <div class="feed-post-card">
+            <div class="post-card-header">
+              <div class="post-author-info">
+                <div class="avatar-sm">SS</div>
+                <div class="author-names">
+                  <strong>@sarah.styles</strong>
+                  <small>Mityana</small>
+                </div>
+              </div>
+              <span class="post-more-options">•••</span>
+            </div>
+            <p class="post-caption-text">New week, new designs ✨</p>
+            <div class="post-image-grid">
+              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" alt="Design 1">
+              <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400" alt="Design 2">
+              <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" alt="Design 3">
+            </div>
+            <div class="post-action-bar">
+              <div class="left-actions">
+                <span class="action-item">♥ 51</span>
+                <span class="action-item">💬 0</span>
+                <span class="action-item">✈️</span>
+              </div>
+              <span class="action-item">🔖</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
       <!-- PROFILE PAGE -->
       <section id="profile-page" class="page">
-        <div class="card profile-header-card">
-          <div class="profile-main">
-            <div class="avatar xl" id="profileAvatar">U</div>
-            <div>
-              <h2 id="profileUsername">@username</h2>
-              <p id="profileBio" class="muted">Welcome to my profile!</p>
-              <p id="profileLocation" class="muted" style="font-size:0.85rem; margin-top:4px;">Uganda</p>
+        <div class="feed-post-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div class="avatar-orange-gradient" id="profileAvatar" style="width:70px; height:70px;">B</div>
+              <div>
+                <h2 id="profileUsername">@anoldbanxx4</h2>
+                <p id="profileBio" style="color:var(--text-muted);">Welcome to my profile!</p>
+              </div>
             </div>
-          </div>
-          <button class="btn secondary" id="openEditProfileBtn">Edit Profile</button>
-        </div>
-
-        <div class="profile-stats card">
-          <div>
-            <strong id="statPostsCount">0</strong>
-            <span>Posts</span>
-          </div>
-          <div>
-            <strong>0</strong>
-            <span>Followers</span>
-          </div>
-          <div>
-            <strong>0</strong>
-            <span>Following</span>
+            <button class="top-nav-btn" id="openEditProfileBtn">Edit Profile</button>
           </div>
         </div>
+        <div id="profileGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div>
+      </section>
 
-        <h3>Your Posts</h3>
-        <div class="profile-grid" id="profileGrid">
-          <!-- Profile posts rendered here -->
+      <!-- SEARCH PAGE -->
+      <section id="search-page" class="page">
+        <div class="feed-post-card">
+          <h2>Search Results</h2>
+          <p style="color:var(--text-muted); margin-top:10px;">Search for creators, topics, and posts.</p>
         </div>
       </section>
 
-      <!-- OTHER PAGES (Placeholders) -->
-      <section id="shorts-page" class="page">
-        <div class="card page-card">
-          <h2>Shorts</h2>
-          <p class="muted">Short videos feed coming soon!</p>
-        </div>
-      </section>
-
-      <section id="subscriptions-page" class="page">
-        <div class="card page-card">
-          <h2>Subscriptions</h2>
-          <p class="muted">Channel subscriptions feed.</p>
-        </div>
-      </section>
-
-      <section id="history-page" class="page">
-        <div class="card page-card">
-          <h2>History</h2>
-          <p class="muted">Your recently viewed posts and videos.</p>
-        </div>
-      </section>
-
-      <section id="liked-page" class="page">
-        <div class="card page-card">
-          <h2>Liked Videos</h2>
-          <p class="muted">Posts and videos you have liked.</p>
-        </div>
-      </section>
-
-      <section id="watch-later-page" class="page">
-        <div class="card page-card">
-          <h2>Watch Later</h2>
-          <p class="muted">Saved items to watch later.</p>
-        </div>
-      </section>
     </main>
 
     <!-- RIGHT SIDEBAR -->
     <aside class="right-sidebar">
-      <div class="card">
-        <h3>Suggested for you</h3>
-        <p class="muted" style="margin-top:10px; font-size:0.85rem;">Discover creators nearby</p>
+      
+      <!-- SUGGESTED CREATORS -->
+      <div class="widget-card">
+        <h3 class="widget-title">Suggested for you</h3>
+        <div class="suggested-users-list">
+          
+          <div class="suggested-user-item">
+            <div class="post-author-info">
+              <div class="avatar-sm">AB</div>
+              <div class="author-names">
+                <strong>@anold.banxx</strong>
+                <small>Kampala, Uganda</small>
+              </div>
+            </div>
+            <button class="btn-follow-outline">Follow</button>
+          </div>
+
+          <div class="suggested-user-item">
+            <div class="post-author-info">
+              <div class="avatar-sm">LB</div>
+              <div class="author-names">
+                <strong>@lynda.banxx</strong>
+                <small>Kampala</small>
+              </div>
+            </div>
+            <button class="btn-follow-outline">Follow</button>
+          </div>
+
+          <div class="suggested-user-item">
+            <div class="post-author-info">
+              <div class="avatar-sm">SS</div>
+              <div class="author-names">
+                <strong>@sarah.styles</strong>
+                <small>Mityana</small>
+              </div>
+            </div>
+            <button class="btn-follow-outline">Follow</button>
+          </div>
+
+        </div>
       </div>
+
+      <!-- TRENDING HASHTAGS -->
+      <div class="widget-card">
+        <h3 class="widget-title">🔥 Trending Hashtags</h3>
+        <div class="trending-list">
+          <div class="trending-item">
+            <span class="trending-tag">#Banxxgram</span>
+            <span class="trending-count">12.4K</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-tag">#GoodVibes</span>
+            <span class="trending-count">8.7K</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-tag">#Kampala</span>
+            <span class="trending-count">6.3K</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-tag">#Fashion</span>
+            <span class="trending-count">5.1K</span>
+          </div>
+        </div>
+      </div>
+
     </aside>
+
   </div>
 
   <!-- EDIT PROFILE MODAL -->
   <div class="modal hidden" id="editProfileModal">
-    <div class="modal-content card">
+    <div class="modal-card">
       <button class="modal-close" id="closeEditProfileBtn">&times;</button>
       <h2>Edit Profile</h2>
       <form id="editProfileForm" style="margin-top:15px;">
         <div class="form-group">
-          <label for="editFullName">Full Name</label>
-          <input type="text" id="editFullName" placeholder="Your full name" required>
+          <label>Full Name</label>
+          <input type="text" id="editFullName" required>
         </div>
         <div class="form-group">
-          <label for="editUsername">Username</label>
-          <input type="text" id="editUsername" placeholder="username" required>
+          <label>Username</label>
+          <input type="text" id="editUsername" required>
         </div>
         <div class="form-group">
-          <label for="editLocation">Location</label>
-          <input type="text" id="editLocation" placeholder="e.g. Uganda">
+          <label>Bio</label>
+          <textarea id="editBio"></textarea>
         </div>
         <div class="form-group">
-          <label for="editBio">Bio</label>
-          <textarea id="editBio" placeholder="Tell us about yourself..."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="editAvatarFile">Profile Picture File</label>
+          <label>Profile Picture</label>
           <input type="file" id="editAvatarFile" accept="image/*">
         </div>
-        <button type="submit" class="btn primary" style="width:100%; margin-top:10px;">Save Changes</button>
+        <button type="submit" class="btn-orange-post" style="width:100%; justify-content:center; margin-top:10px;">Save Changes</button>
       </form>
     </div>
   </div>
 
   <!-- CREATE POST MODAL -->
   <div class="modal hidden" id="createPostModal">
-    <div class="modal-content card">
+    <div class="modal-card">
       <button class="modal-close" id="closeCreatePostBtn">&times;</button>
       <h2>Create Post</h2>
       <form id="createPostForm" style="margin-top:15px;">
         <div class="form-group">
-          <label for="postContent">Caption</label>
+          <label>Caption</label>
           <textarea id="postContent" placeholder="What's on your mind?"></textarea>
         </div>
         <div class="form-group">
-          <label for="postMediaFile">Photo or Video File</label>
+          <label>Media File</label>
           <input type="file" id="postMediaFile" accept="image/*,video/*">
         </div>
-        <button type="submit" class="btn primary" style="width:100%; margin-top:10px;">Post</button>
+        <button type="submit" class="btn-orange-post" style="width:100%; justify-content:center; margin-top:10px;">Post</button>
       </form>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
   <div class="toast" id="toast">Message</div>
 
   <script src="app.js"></script>
