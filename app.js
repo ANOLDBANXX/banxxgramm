@@ -1,7 +1,7 @@
 // ==========================================
 // 1. SUPABASE INITIALIZATION
 // ==========================================
-const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co'; //
+const SUPABASE_URL = 'https://pniuwblnrhybnkdggbim.supabase.co'; //
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey...'; //
 
 let supabaseClient = null;
