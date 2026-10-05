@@ -67,6 +67,26 @@
       <!-- HOME PAGE -->
       <section id="home-page" class="page active">
         
+        <!-- STORIES TRAY -->
+        <div class="stories-container">
+          <div class="story-item active-user">
+            <div class="story-ring add-story">+</div>
+            <small>Your Story</small>
+          </div>
+          <div class="story-item">
+            <div class="story-ring">AB</div>
+            <small>anold</small>
+          </div>
+          <div class="story-item">
+            <div class="story-ring">LB</div>
+            <small>lynda</small>
+          </div>
+          <div class="story-item">
+            <div class="story-ring">SS</div>
+            <small>sarah</small>
+          </div>
+        </div>
+
         <!-- CREATE POST INLINE BOX -->
         <div class="create-post-card">
           <div class="create-post-top">
@@ -96,6 +116,11 @@
               <div>
                 <h2 id="profileUsername">@anoldbanxx4</h2>
                 <p id="profileBio" style="color:var(--text-muted); margin-top:4px;">Welcome to my profile!</p>
+                <div style="display:flex; gap:15px; margin-top:10px; font-size:0.85rem;">
+                  <span><strong id="postCount">0</strong> posts</span>
+                  <span><strong id="followersCount">128</strong> followers</span>
+                  <span><strong>94</strong> following</span>
+                </div>
               </div>
             </div>
             <button class="top-nav-btn" id="openEditProfileBtn">Edit Profile</button>
