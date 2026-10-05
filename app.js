@@ -160,7 +160,6 @@ function setupModals() {
 
   document.getElementById('closeCommentsBtn')?.addEventListener('click', () => commentsModal?.classList.add('hidden'));
 
-  // Auth buttons demo click
   document.getElementById('switchAccountBtn')?.addEventListener('click', () => showToast('Sign In feature active!'));
   document.getElementById('logoutBtn')?.addEventListener('click', () => showToast('Sign Up feature active!'));
 
@@ -267,159 +266,20 @@ function filterPosts(query) {
 
 // Widget & Sidebar Interaction Handlers
 function setupSidebarAndWidgets() {
+  // Story Click Interactions
+  document.querySelectorAll('.story-item').forEach(item => {
+    item.addEventListener('click', () => {
+      showToast('Story feature clicked!');
+    });
+  });
+
   // Follow buttons
   document.querySelectorAll('.btn-follow-outline').forEach(btn => {
     btn.addEventListener('click', function() {
+      const followersEl = document.getElementById('followersCount');
+      let currentFollowers = followersEl ? parseInt(followersEl.textContent) || 128 : 128;
+
       if (this.textContent === 'Follow') {
         this.textContent = 'Following';
         this.style.background = 'var(--accent-blue)';
-      } else {
-        this.textContent = 'Follow';
-        this.style.background = 'transparent';
-      }
-    });
-  });
-
-  // Trending Hashtag Clicks
-  document.querySelectorAll('.trending-item').forEach(item => {
-    item.addEventListener('click', function() {
-      const tag = this.querySelector('.trending-tag')?.textContent;
-      if (tag) {
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) searchInput.value = tag;
-        filterPosts(tag.toLowerCase());
-        showToast(`Filtered feed for ${tag}`);
-      }
-    });
-  });
-}
-
-// ==========================================
-// 4. RENDERING & ACTION HANDLERS
-// ==========================================
-function renderPosts(postsToRender) {
-  const feedContainer = document.getElementById('feedContainer');
-  const profileGrid = document.getElementById('profileGrid');
-
-  if (feedContainer) feedContainer.innerHTML = '';
-  if (profileGrid) profileGrid.innerHTML = '';
-
-  postsToRender.forEach(post => {
-    const card = document.createElement('div');
-    card.className = 'feed-post-card';
-
-    card.innerHTML = `
-      <div class="post-card-header">
-        <div class="post-author-info">
-          <div class="avatar-sm">${post.author.substring(1, 3).toUpperCase()}</div>
-          <div class="author-names">
-            <strong>${post.author}</strong>
-            <small>${post.location || 'Uganda'}</small>
-          </div>
-        </div>
-        <span class="post-more-options" onclick="showToast('Options menu opened')">•••</span>
-      </div>
-      ${post.caption ? `<p class="post-caption-text">${post.caption}</p>` : ''}
-      ${post.media_url ? `<img src="${post.media_url}" class="post-image-preview" alt="Post attachment">` : ''}
-      <div class="post-action-bar">
-        <div class="left-actions">
-          <span class="action-item ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
-            ${post.liked ? '❤️️' : '♥'} ${post.likes}
-          </span>
-          <span class="action-item" onclick="openCommentsModal('${post.id}')">
-            💬 ${(post.comments || []).length}
-          </span>
-          <span class="action-item" onclick="sharePost('${post.id}')">✈️</span>
-        </div>
-        <span class="action-item" onclick="toggleSavePost('${post.id}')">
-          ${post.saved ? '🔖 Saved' : '🔖'}
-        </span>
-      </div>
-    `;
-
-    feedContainer?.appendChild(card);
-  });
-
-  // Profile Tiles
-  const myPosts = allPosts.filter(p => p.user_id === currentUser.id);
-  myPosts.forEach(post => {
-    const tile = document.createElement('div');
-    tile.style.cssText = 'background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:12px; height:160px; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:10px;';
-    
-    if (post.media_url) {
-      tile.innerHTML = `<img src="${post.media_url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
-    } else {
-      tile.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted); text-align:center;">${post.caption}</p>`;
-    }
-    profileGrid?.appendChild(tile);
-  });
-}
-
-// Toggle Like
-window.toggleLike = function(postId) {
-  const post = allPosts.find(p => p.id === postId);
-  if (post) {
-    post.liked = !post.liked;
-    post.likes += post.liked ? 1 : -1;
-    renderPosts(allPosts);
-  }
-};
-
-// Toggle Save / Bookmark
-window.toggleSavePost = function(postId) {
-  const post = allPosts.find(p => p.id === postId);
-  if (post) {
-    post.saved = !post.saved;
-    renderPosts(allPosts);
-    showToast(post.saved ? 'Post saved to bookmarks!' : 'Post removed from saved.');
-  }
-};
-
-// Share Post Link
-window.sharePost = function(postId) {
-  navigator.clipboard.writeText(window.location.href);
-  showToast('Link copied to clipboard!');
-};
-
-// Comments Modal Trigger
-window.openCommentsModal = function(postId) {
-  activeCommentPostId = postId;
-  const post = allPosts.find(p => p.id === postId);
-  const commentsList = document.getElementById('commentsList');
-  if (!post || !commentsList) return;
-
-  commentsList.innerHTML = '';
-  const comments = post.comments || [];
-
-  if (comments.length === 0) {
-    commentsList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center;">No comments yet. Start the conversation!</p>';
-  } else {
-    comments.forEach(c => {
-      const item = document.createElement('div');
-      item.style.cssText = 'background:#061022; padding:10px 14px; border-radius:10px; font-size:0.88rem;';
-      item.textContent = c;
-      commentsList.appendChild(item);
-    });
-  }
-
-  document.getElementById('commentsModal')?.classList.remove('hidden');
-};
-
-async function fetchSupabasePosts() {
-  if (!supabase) return;
-  const { data } = await supabase.from('posts').select('*');
-  if (data && data.length > 0) {
-    allPosts = data.map(p => ({
-      id: p.id,
-      user_id: p.user_id || 'remote',
-      author: '@community.user',
-      location: 'Uganda',
-      caption: p.caption,
-      media_url: p.media_url,
-      likes: 0,
-      liked: false,
-      saved: false,
-      comments: []
-    }));
-  }
-}
+        if (followersEl) followersEl.textContent = currentFollowers + 1;
