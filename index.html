@@ -67,7 +67,7 @@
       <!-- HOME PAGE -->
       <section id="home-page" class="page active">
         
-        <!-- CREATE POST INPUT CARD -->
+        <!-- CREATE POST INLINE BOX -->
         <div class="create-post-card">
           <div class="create-post-top">
             <div class="avatar-sm" id="createPostAvatar">B</div>
@@ -75,8 +75,8 @@
           </div>
           <div class="create-post-bottom">
             <div class="attach-media-options">
-              <span class="attach-option">🖼️ Photo</span>
-              <span class="attach-option">🎥 Video</span>
+              <label class="attach-option" for="inlineFileInput">🖼️ Photo/Video</label>
+              <input type="file" id="inlineFileInput" accept="image/*,video/*" style="display:none;">
               <span class="attach-option">👤 Tag</span>
             </div>
             <button class="btn-orange-post" id="inlinePostBtn">🚀 Post</button>
@@ -84,61 +84,7 @@
         </div>
 
         <!-- DYNAMIC FEED -->
-        <div id="feedContainer" style="display:flex; flex-direction:column; gap:20px;">
-          
-          <!-- Sample Card 1 matching target UI -->
-          <div class="feed-post-card">
-            <div class="post-card-header">
-              <div class="post-author-info">
-                <div class="avatar-sm">LB</div>
-                <div class="author-names">
-                  <strong>@llynda.banxx</strong>
-                  <small>Kampala, Uganda</small>
-                </div>
-              </div>
-              <span class="post-more-options">•••</span>
-            </div>
-            <p class="post-caption-text">Good vibes only ☀️</p>
-            <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1000" class="post-image-preview" alt="City Sunset">
-            <div class="post-action-bar">
-              <div class="left-actions">
-                <span class="action-item">♥ 24</span>
-                <span class="action-item">💬 2</span>
-                <span class="action-item">✈️</span>
-              </div>
-              <span class="action-item">🔖</span>
-            </div>
-          </div>
-
-          <!-- Sample Card 2 matching target UI -->
-          <div class="feed-post-card">
-            <div class="post-card-header">
-              <div class="post-author-info">
-                <div class="avatar-sm">SS</div>
-                <div class="author-names">
-                  <strong>@sarah.styles</strong>
-                  <small>Mityana</small>
-                </div>
-              </div>
-              <span class="post-more-options">•••</span>
-            </div>
-            <p class="post-caption-text">New week, new designs ✨</p>
-            <div class="post-image-grid">
-              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400" alt="Design 1">
-              <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400" alt="Design 2">
-              <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400" alt="Design 3">
-            </div>
-            <div class="post-action-bar">
-              <div class="left-actions">
-                <span class="action-item">♥ 51</span>
-                <span class="action-item">💬 0</span>
-                <span class="action-item">✈️</span>
-              </div>
-              <span class="action-item">🔖</span>
-            </div>
-          </div>
-
-        </div>
+        <div id="feedContainer" style="display:flex; flex-direction:column; gap:20px;"></div>
       </section>
 
       <!-- PROFILE PAGE -->
@@ -149,7 +95,7 @@
               <div class="avatar-orange-gradient" id="profileAvatar" style="width:70px; height:70px;">B</div>
               <div>
                 <h2 id="profileUsername">@anoldbanxx4</h2>
-                <p id="profileBio" style="color:var(--text-muted);">Welcome to my profile!</p>
+                <p id="profileBio" style="color:var(--text-muted); margin-top:4px;">Welcome to my profile!</p>
               </div>
             </div>
             <button class="top-nav-btn" id="openEditProfileBtn">Edit Profile</button>
@@ -162,20 +108,18 @@
       <section id="search-page" class="page">
         <div class="feed-post-card">
           <h2>Search Results</h2>
-          <p style="color:var(--text-muted); margin-top:10px;">Search for creators, topics, and posts.</p>
+          <p style="color:var(--text-muted); margin-top:10px;">Search for creators, topics, and posts using the search bar above.</p>
         </div>
+        <div id="searchResultsContainer" style="display:flex; flex-direction:column; gap:20px; margin-top:10px;"></div>
       </section>
 
     </main>
 
     <!-- RIGHT SIDEBAR -->
     <aside class="right-sidebar">
-      
-      <!-- SUGGESTED CREATORS -->
       <div class="widget-card">
         <h3 class="widget-title">Suggested for you</h3>
         <div class="suggested-users-list">
-          
           <div class="suggested-user-item">
             <div class="post-author-info">
               <div class="avatar-sm">AB</div>
@@ -186,7 +130,6 @@
             </div>
             <button class="btn-follow-outline">Follow</button>
           </div>
-
           <div class="suggested-user-item">
             <div class="post-author-info">
               <div class="avatar-sm">LB</div>
@@ -197,22 +140,9 @@
             </div>
             <button class="btn-follow-outline">Follow</button>
           </div>
-
-          <div class="suggested-user-item">
-            <div class="post-author-info">
-              <div class="avatar-sm">SS</div>
-              <div class="author-names">
-                <strong>@sarah.styles</strong>
-                <small>Mityana</small>
-              </div>
-            </div>
-            <button class="btn-follow-outline">Follow</button>
-          </div>
-
         </div>
       </div>
 
-      <!-- TRENDING HASHTAGS -->
       <div class="widget-card">
         <h3 class="widget-title">🔥 Trending Hashtags</h3>
         <div class="trending-list">
@@ -228,13 +158,8 @@
             <span class="trending-tag">#Kampala</span>
             <span class="trending-count">6.3K</span>
           </div>
-          <div class="trending-item">
-            <span class="trending-tag">#Fashion</span>
-            <span class="trending-count">5.1K</span>
-          </div>
         </div>
       </div>
-
     </aside>
 
   </div>
@@ -282,6 +207,19 @@
         </div>
         <button type="submit" class="btn-orange-post" style="width:100%; justify-content:center; margin-top:10px;">Post</button>
       </form>
+    </div>
+  </div>
+
+  <!-- COMMENTS MODAL -->
+  <div class="modal hidden" id="commentsModal">
+    <div class="modal-card">
+      <button class="modal-close" id="closeCommentsBtn">&times;</button>
+      <h2>Comments</h2>
+      <div id="commentsList" style="max-height: 250px; overflow-y: auto; margin: 15px 0; display:flex; flex-direction:column; gap:10px;"></div>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="commentInput" placeholder="Add a comment..." style="flex:1; background:#061022; border:1px solid var(--panel-border); padding:10px; border-radius:20px; color:#fff; outline:none;">
+        <button class="btn-orange-post" id="sendCommentBtn">Send</button>
+      </div>
     </div>
   </div>
 
