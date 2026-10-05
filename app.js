@@ -4,9 +4,10 @@
 const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co'; 
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; 
 
-const supabase = (window.supabase && SUPABASE_URL.includes('https://')) 
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
-  : null;
+let supabaseClient = null;
+if (window.supabase && typeof window.supabase.createClient === 'function' && SUPABASE_URL.includes('https://')) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
 // ==========================================
 // 2. GLOBAL STATE
@@ -62,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initApp() {
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       if (session && session.user) {
         currentUser.id = session.user.id;
         await loadUserProfile();
@@ -325,7 +326,7 @@ function renderPosts(postsToRender) {
           <span class="action-item" onclick="openCommentsModal('${post.id}')">
             💬 ${(post.comments || []).length}
           </span>
-          <span class="action-item" onclick="sharePost('${post.id}')">✈️</span>
+          <span class="action-item" onclick="sharePost('${post.id}')">✈</span>
         </div>
         <span class="action-item" onclick="toggleSavePost('${post.id}')">
           ${post.saved ? '🔖 Saved' : '🔖'}
@@ -418,8 +419,8 @@ window.openCommentsModal = function(postId) {
 };
 
 async function fetchSupabasePosts() {
-  if (!supabase) return;
-  const { data } = await supabase.from('posts').select('*');
+  if (!supabaseClient) return;
+  const { data } = await supabaseClient.from('posts').select('*');
   if (data && data.length > 0) {
     allPosts = data.map(p => ({
       id: p.id,
