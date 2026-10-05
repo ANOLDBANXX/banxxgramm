@@ -78,7 +78,6 @@ async function initApp() {
   renderPosts(allPosts);
 }
 
-// UI Notification Toast
 function showToast(message) {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -87,7 +86,6 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-// Avatar Renderer
 function renderAvatar(element, avatarUrl, name = 'User') {
   if (!element) return;
   if (avatarUrl && avatarUrl.trim() !== '') {
@@ -102,7 +100,6 @@ function renderAvatar(element, avatarUrl, name = 'User') {
   }
 }
 
-// Update User Elements
 function updateUIWithUser(profile) {
   const fullName = profile.full_name || 'User';
   const username = `@${profile.username || 'user'}`;
@@ -124,7 +121,6 @@ function updateUIWithUser(profile) {
   if (editBio) editBio.value = profile.bio || '';
 }
 
-// Page Navigation Logic
 function setupNavigation() {
   const navItems = document.querySelectorAll('.nav-item');
   const pages = document.querySelectorAll('.page');
@@ -145,7 +141,6 @@ function setupNavigation() {
   });
 }
 
-// Modal Toggle Handlers
 function setupModals() {
   const editModal = document.getElementById('editProfileModal');
   const createModal = document.getElementById('createPostModal');
@@ -170,9 +165,7 @@ function setupModals() {
   });
 }
 
-// Form Submission Handlers
 function setupForms() {
-  // Edit Profile Form
   document.getElementById('editProfileForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     currentUser.full_name = document.getElementById('editFullName').value;
@@ -184,7 +177,6 @@ function setupForms() {
     showToast('Profile updated!');
   });
 
-  // Modal Post Creation
   document.getElementById('createPostForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const caption = document.getElementById('postContent').value;
@@ -195,7 +187,6 @@ function setupForms() {
     document.getElementById('createPostModal').classList.add('hidden');
   });
 
-  // Inline Feed Post Creation
   document.getElementById('inlinePostBtn')?.addEventListener('click', () => {
     const input = document.getElementById('inlinePostContent');
     const fileInput = document.getElementById('inlineFileInput');
@@ -208,7 +199,6 @@ function setupForms() {
     if (fileInput) fileInput.value = '';
   });
 
-  // Comment Submission
   document.getElementById('sendCommentBtn')?.addEventListener('click', () => {
     const input = document.getElementById('commentInput');
     if (!input.value.trim() || !activeCommentPostId) return;
@@ -225,7 +215,6 @@ function setupForms() {
   });
 }
 
-// Create New Post Function
 function createNewPost(caption, file) {
   const newPost = {
     id: 'post-' + Date.now(),
@@ -245,7 +234,6 @@ function createNewPost(caption, file) {
   showToast('Post created successfully!');
 }
 
-// Search Filter Handler
 function setupSearch() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
@@ -264,16 +252,13 @@ function filterPosts(query) {
   renderPosts(filtered);
 }
 
-// Widget & Sidebar Interaction Handlers
 function setupSidebarAndWidgets() {
-  // Story Click Interactions
   document.querySelectorAll('.story-item').forEach(item => {
     item.addEventListener('click', () => {
       showToast('Story feature clicked!');
     });
   });
 
-  // Follow buttons
   document.querySelectorAll('.btn-follow-outline').forEach(btn => {
     btn.addEventListener('click', function() {
       const followersEl = document.getElementById('followersCount');
@@ -283,3 +268,170 @@ function setupSidebarAndWidgets() {
         this.textContent = 'Following';
         this.style.background = 'var(--accent-blue)';
         if (followersEl) followersEl.textContent = currentFollowers + 1;
+      } else {
+        this.textContent = 'Follow';
+        this.style.background = 'transparent';
+        if (followersEl) followersEl.textContent = Math.max(0, currentFollowers - 1);
+      }
+    });
+  });
+
+  document.querySelectorAll('.trending-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const tag = this.querySelector('.trending-tag')?.textContent;
+      if (tag) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = tag;
+        filterPosts(tag.toLowerCase());
+        showToast(`Filtered feed for ${tag}`);
+      }
+    });
+  });
+}
+
+// ==========================================
+// 4. RENDERING & ACTION HANDLERS
+// ==========================================
+function renderPosts(postsToRender) {
+  const feedContainer = document.getElementById('feedContainer');
+  const profileGrid = document.getElementById('profileGrid');
+  const postCountEl = document.getElementById('postCount');
+
+  if (feedContainer) feedContainer.innerHTML = '';
+  if (profileGrid) profileGrid.innerHTML = '';
+
+  postsToRender.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'feed-post-card';
+
+    card.innerHTML = `
+      <div class="post-card-header">
+        <div class="post-author-info">
+          <div class="avatar-sm">${post.author.substring(1, 3).toUpperCase()}</div>
+          <div class="author-names">
+            <strong>${post.author}</strong>
+            <small>${post.location || 'Uganda'}</small>
+          </div>
+        </div>
+        <span class="post-more-options" onclick="showToast('Options menu opened')">•••</span>
+      </div>
+      ${post.caption ? `<p class="post-caption-text">${post.caption}</p>` : ''}
+      ${post.media_url ? `<img src="${post.media_url}" class="post-image-preview" data-post-id="${post.id}" alt="Post attachment">` : ''}
+      <div class="post-action-bar">
+        <div class="left-actions">
+          <span class="action-item ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+            ${post.liked ? '❤' : '♥'} ${post.likes}
+          </span>
+          <span class="action-item" onclick="openCommentsModal('${post.id}')">
+            💬 ${(post.comments || []).length}
+          </span>
+          <span class="action-item" onclick="sharePost('${post.id}')">✈️</span>
+        </div>
+        <span class="action-item" onclick="toggleSavePost('${post.id}')">
+          ${post.saved ? '🔖 Saved' : '🔖'}
+        </span>
+      </div>
+    `;
+
+    feedContainer?.appendChild(card);
+  });
+
+  const myPosts = allPosts.filter(p => p.user_id === currentUser.id);
+  if (postCountEl) postCountEl.textContent = myPosts.length;
+
+  myPosts.forEach(post => {
+    const tile = document.createElement('div');
+    tile.style.cssText = 'background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:12px; height:160px; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:10px;';
+    
+    if (post.media_url) {
+      tile.innerHTML = `<img src="${post.media_url}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
+    } else {
+      tile.innerHTML = `<p style="font-size:0.85rem; color:var(--text-muted); text-align:center;">${post.caption}</p>`;
+    }
+    profileGrid?.appendChild(tile);
+  });
+
+  attachImageDoubleTap();
+}
+
+window.toggleLike = function(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (post) {
+    post.liked = !post.liked;
+    post.likes += post.liked ? 1 : -1;
+    renderPosts(allPosts);
+  }
+};
+
+function attachImageDoubleTap() {
+  document.querySelectorAll('.post-image-preview').forEach(img => {
+    img.addEventListener('dblclick', function() {
+      const postId = this.getAttribute('data-post-id');
+      if (postId) {
+        const post = allPosts.find(p => p.id === postId);
+        if (post && !post.liked) {
+          toggleLike(postId);
+          showToast('Liked post! ❤️');
+        } else if (post && post.liked) {
+          showToast('Post already liked! ❤️');
+        }
+      }
+    });
+  });
+}
+
+window.toggleSavePost = function(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (post) {
+    post.saved = !post.saved;
+    renderPosts(allPosts);
+    showToast(post.saved ? 'Post saved to bookmarks!' : 'Post removed from saved.');
+  }
+};
+
+window.sharePost = function(postId) {
+  navigator.clipboard.writeText(window.location.href);
+  showToast('Link copied to clipboard!');
+};
+
+window.openCommentsModal = function(postId) {
+  activeCommentPostId = postId;
+  const post = allPosts.find(p => p.id === postId);
+  const commentsList = document.getElementById('commentsList');
+  if (!post || !commentsList) return;
+
+  commentsList.innerHTML = '';
+  const comments = post.comments || [];
+
+  if (comments.length === 0) {
+    commentsList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center;">No comments yet. Start the conversation!</p>';
+  } else {
+    comments.forEach(c => {
+      const item = document.createElement('div');
+      item.style.cssText = 'background:#061022; padding:10px 14px; border-radius:10px; font-size:0.88rem;';
+      item.textContent = c;
+      commentsList.appendChild(item);
+    });
+  }
+
+  document.getElementById('commentsModal')?.classList.remove('hidden');
+};
+
+async function fetchSupabasePosts() {
+  if (!supabase) return;
+  const { data } = await supabase.from('posts').select('*');
+  if (data && data.length > 0) {
+    allPosts = data.map(p => ({
+      id: p.id,
+      user_id: p.user_id || 'remote',
+      author: '@community.user',
+      location: 'Uganda',
+      caption: p.caption,
+      media_url: p.media_url,
+      likes: 0,
+      liked: false,
+      saved: false,
+      comments: []
+    }));
+  }
+}
