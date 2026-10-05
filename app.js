@@ -8,7 +8,9 @@ const supabase = (window.supabase && SUPABASE_URL.includes('https://'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
   : null;
 
-// Application State
+// ==========================================
+// 2. GLOBAL STATE
+// ==========================================
 let currentUser = {
   id: 'user-default-123',
   full_name: 'Anold Banxx',
@@ -24,10 +26,11 @@ let allPosts = [
     user_id: 'user-2',
     author: '@llynda.banxx',
     location: 'Kampala, Uganda',
-    caption: 'Good vibes only ☀️',
+    caption: 'Good vibes only ☀️ #Banxxgram #GoodVibes',
     media_url: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1000',
     likes: 24,
     liked: false,
+    saved: false,
     comments: ['Beautiful view!', 'Loving this content.']
   },
   {
@@ -35,10 +38,11 @@ let allPosts = [
     user_id: 'user-3',
     author: '@sarah.styles',
     location: 'Mityana',
-    caption: 'New week, new designs ✨',
+    caption: 'New week, new designs ✨ #Fashion #Kampala',
     media_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1000',
     likes: 51,
     liked: false,
+    saved: false,
     comments: ['Amazing outfit!']
   }
 ];
@@ -46,8 +50,35 @@ let allPosts = [
 let activeCommentPostId = null;
 
 // ==========================================
-// 2. HELPER FUNCTIONS
+// 3. INITIALIZATION & LISTENERS
 // ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  initApp();
+  setupNavigation();
+  setupModals();
+  setupForms();
+  setupSearch();
+  setupSidebarAndWidgets();
+});
+
+async function initApp() {
+  if (supabase) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        currentUser.id = session.user.id;
+        await loadUserProfile();
+      }
+      await fetchSupabasePosts();
+    } catch (e) {
+      console.warn('Supabase offline or schema missing. Utilizing active local state.');
+    }
+  }
+  updateUIWithUser(currentUser);
+  renderPosts(allPosts);
+}
+
+// UI Notification Toast
 function showToast(message) {
   const toast = document.getElementById('toast');
   if (!toast) return;
@@ -56,6 +87,7 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
+// Avatar Renderer
 function renderAvatar(element, avatarUrl, name = 'User') {
   if (!element) return;
   if (avatarUrl && avatarUrl.trim() !== '') {
@@ -70,34 +102,7 @@ function renderAvatar(element, avatarUrl, name = 'User') {
   }
 }
 
-// ==========================================
-// 3. APP INIT & EVENT LISTENERS
-// ==========================================
-document.addEventListener('DOMContentLoaded', () => {
-  initApp();
-  setupNavigation();
-  setupModals();
-  setupForms();
-  setupSearch();
-});
-
-async function initApp() {
-  if (supabase) {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && session.user) {
-        currentUser.id = session.user.id;
-        await loadUserProfile();
-      }
-      await fetchSupabasePosts();
-    } catch (e) {
-      console.warn('Supabase offline or table missing. Using local state.');
-    }
-  }
-  updateUIWithUser(currentUser);
-  renderPosts(allPosts);
-}
-
+// Update User Elements
 function updateUIWithUser(profile) {
   const fullName = profile.full_name || 'User';
   const username = `@${profile.username || 'user'}`;
@@ -119,12 +124,14 @@ function updateUIWithUser(profile) {
   if (editBio) editBio.value = profile.bio || '';
 }
 
+// Page Navigation Logic
 function setupNavigation() {
   const navItems = document.querySelectorAll('.nav-item');
   const pages = document.querySelectorAll('.page');
 
   navItems.forEach(item => {
-    item.addEventListener('click', () => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
       const targetPageId = item.getAttribute('data-page');
       if (!targetPageId) return;
 
@@ -138,6 +145,7 @@ function setupNavigation() {
   });
 }
 
+// Modal Toggle Handlers
 function setupModals() {
   const editModal = document.getElementById('editProfileModal');
   const createModal = document.getElementById('createPostModal');
@@ -152,6 +160,10 @@ function setupModals() {
 
   document.getElementById('closeCommentsBtn')?.addEventListener('click', () => commentsModal?.classList.add('hidden'));
 
+  // Auth buttons demo click
+  document.getElementById('switchAccountBtn')?.addEventListener('click', () => showToast('Sign In feature active!'));
+  document.getElementById('logoutBtn')?.addEventListener('click', () => showToast('Sign Up feature active!'));
+
   window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {
       e.target.classList.add('hidden');
@@ -159,11 +171,9 @@ function setupModals() {
   });
 }
 
-// ==========================================
-// 4. FORMS & ACTIONS
-// ==========================================
+// Form Submission Handlers
 function setupForms() {
-  // Edit Profile
+  // Edit Profile Form
   document.getElementById('editProfileForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     currentUser.full_name = document.getElementById('editFullName').value;
@@ -175,31 +185,31 @@ function setupForms() {
     showToast('Profile updated!');
   });
 
-  // Modal Create Post
+  // Modal Post Creation
   document.getElementById('createPostForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const caption = document.getElementById('postContent').value;
     const fileInput = document.getElementById('postMediaFile');
     
-    createNewPost(caption, fileInput.files[0]);
+    createNewPost(caption, fileInput.files ? fileInput.files[0] : null);
     document.getElementById('createPostForm').reset();
     document.getElementById('createPostModal').classList.add('hidden');
   });
 
-  // Inline Feed Post
+  // Inline Feed Post Creation
   document.getElementById('inlinePostBtn')?.addEventListener('click', () => {
     const input = document.getElementById('inlinePostContent');
     const fileInput = document.getElementById('inlineFileInput');
-    if (!input.value.trim() && (!fileInput.files || !fileInput.files[0])) {
-      showToast('Please type a message or select an image');
+    if (!input.value.trim() && (!fileInput || !fileInput.files[0])) {
+      showToast('Please enter text or select a photo.');
       return;
     }
-    createNewPost(input.value, fileInput.files ? fileInput.files[0] : null);
+    createNewPost(input.value, fileInput ? fileInput.files[0] : null);
     input.value = '';
     if (fileInput) fileInput.value = '';
   });
 
-  // Comments submit
+  // Comment Submission
   document.getElementById('sendCommentBtn')?.addEventListener('click', () => {
     const input = document.getElementById('commentInput');
     if (!input.value.trim() || !activeCommentPostId) return;
@@ -207,15 +217,16 @@ function setupForms() {
     const post = allPosts.find(p => p.id === activeCommentPostId);
     if (post) {
       if (!post.comments) post.comments = [];
-      post.comments.push(`${currentUser.username}: ${input.value}`);
+      post.comments.push(`@${currentUser.username}: ${input.value.trim()}`);
       input.value = '';
       openCommentsModal(post.id);
       renderPosts(allPosts);
-      showToast('Comment added!');
+      showToast('Comment posted!');
     }
   });
 }
 
+// Create New Post Function
 function createNewPost(caption, file) {
   const newPost = {
     id: 'post-' + Date.now(),
@@ -226,30 +237,65 @@ function createNewPost(caption, file) {
     media_url: file ? URL.createObjectURL(file) : '',
     likes: 0,
     liked: false,
+    saved: false,
     comments: []
   };
 
   allPosts.unshift(newPost);
   renderPosts(allPosts);
-  showToast('Post published!');
+  showToast('Post created successfully!');
 }
 
+// Search Filter Handler
 function setupSearch() {
   const searchInput = document.getElementById('searchInput');
   if (!searchInput) return;
 
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
-    const filtered = allPosts.filter(p => 
-      p.caption.toLowerCase().includes(query) || 
-      p.author.toLowerCase().includes(query)
-    );
-    renderPosts(filtered);
+    filterPosts(query);
+  });
+}
+
+function filterPosts(query) {
+  const filtered = allPosts.filter(p => 
+    p.caption.toLowerCase().includes(query) || 
+    p.author.toLowerCase().includes(query)
+  );
+  renderPosts(filtered);
+}
+
+// Widget & Sidebar Interaction Handlers
+function setupSidebarAndWidgets() {
+  // Follow buttons
+  document.querySelectorAll('.btn-follow-outline').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (this.textContent === 'Follow') {
+        this.textContent = 'Following';
+        this.style.background = 'var(--accent-blue)';
+      } else {
+        this.textContent = 'Follow';
+        this.style.background = 'transparent';
+      }
+    });
+  });
+
+  // Trending Hashtag Clicks
+  document.querySelectorAll('.trending-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const tag = this.querySelector('.trending-tag')?.textContent;
+      if (tag) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = tag;
+        filterPosts(tag.toLowerCase());
+        showToast(`Filtered feed for ${tag}`);
+      }
+    });
   });
 }
 
 // ==========================================
-// 5. RENDERING & INTERACTION
+// 4. RENDERING & ACTION HANDLERS
 // ==========================================
 function renderPosts(postsToRender) {
   const feedContainer = document.getElementById('feedContainer');
@@ -271,28 +317,30 @@ function renderPosts(postsToRender) {
             <small>${post.location || 'Uganda'}</small>
           </div>
         </div>
-        <span class="post-more-options">•••</span>
+        <span class="post-more-options" onclick="showToast('Options menu opened')">•••</span>
       </div>
       ${post.caption ? `<p class="post-caption-text">${post.caption}</p>` : ''}
-      ${post.media_url ? `<img src="${post.media_url}" class="post-image-preview" alt="Media">` : ''}
+      ${post.media_url ? `<img src="${post.media_url}" class="post-image-preview" alt="Post attachment">` : ''}
       <div class="post-action-bar">
         <div class="left-actions">
           <span class="action-item ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
-            ${post.liked ? '❤️' : '♥'} ${post.likes}
+            ${post.liked ? '❤️️' : '♥'} ${post.likes}
           </span>
           <span class="action-item" onclick="openCommentsModal('${post.id}')">
             💬 ${(post.comments || []).length}
           </span>
-          <span class="action-item" onclick="showToast('Link copied!')">✈️</span>
+          <span class="action-item" onclick="sharePost('${post.id}')">✈️</span>
         </div>
-        <span class="action-item" onclick="showToast('Post saved!')">🔖</span>
+        <span class="action-item" onclick="toggleSavePost('${post.id}')">
+          ${post.saved ? '🔖 Saved' : '🔖'}
+        </span>
       </div>
     `;
 
     feedContainer?.appendChild(card);
   });
 
-  // Populate Profile Grid
+  // Profile Tiles
   const myPosts = allPosts.filter(p => p.user_id === currentUser.id);
   myPosts.forEach(post => {
     const tile = document.createElement('div');
@@ -307,16 +355,34 @@ function renderPosts(postsToRender) {
   });
 }
 
-function toggleLike(postId) {
+// Toggle Like
+window.toggleLike = function(postId) {
   const post = allPosts.find(p => p.id === postId);
   if (post) {
     post.liked = !post.liked;
     post.likes += post.liked ? 1 : -1;
     renderPosts(allPosts);
   }
-}
+};
 
-function openCommentsModal(postId) {
+// Toggle Save / Bookmark
+window.toggleSavePost = function(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (post) {
+    post.saved = !post.saved;
+    renderPosts(allPosts);
+    showToast(post.saved ? 'Post saved to bookmarks!' : 'Post removed from saved.');
+  }
+};
+
+// Share Post Link
+window.sharePost = function(postId) {
+  navigator.clipboard.writeText(window.location.href);
+  showToast('Link copied to clipboard!');
+};
+
+// Comments Modal Trigger
+window.openCommentsModal = function(postId) {
   activeCommentPostId = postId;
   const post = allPosts.find(p => p.id === postId);
   const commentsList = document.getElementById('commentsList');
@@ -326,22 +392,22 @@ function openCommentsModal(postId) {
   const comments = post.comments || [];
 
   if (comments.length === 0) {
-    commentsList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">No comments yet. Be the first!</p>';
+    commentsList.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem; text-align:center;">No comments yet. Start the conversation!</p>';
   } else {
     comments.forEach(c => {
       const item = document.createElement('div');
-      item.style.cssText = 'background:#061022; padding:8px 12px; border-radius:8px; font-size:0.85rem;';
+      item.style.cssText = 'background:#061022; padding:10px 14px; border-radius:10px; font-size:0.88rem;';
       item.textContent = c;
       commentsList.appendChild(item);
     });
   }
 
   document.getElementById('commentsModal')?.classList.remove('hidden');
-}
+};
 
 async function fetchSupabasePosts() {
   if (!supabase) return;
-  const { data, error } = await supabase.from('posts').select('*');
+  const { data } = await supabase.from('posts').select('*');
   if (data && data.length > 0) {
     allPosts = data.map(p => ({
       id: p.id,
@@ -352,6 +418,7 @@ async function fetchSupabasePosts() {
       media_url: p.media_url,
       likes: 0,
       liked: false,
+      saved: false,
       comments: []
     }));
   }
