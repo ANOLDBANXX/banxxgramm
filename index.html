@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
-<link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -95,7 +95,7 @@
           </div>
           <div class="create-post-bottom">
             <div class="attach-media-options">
-              <label class="attach-option" for="inlineFileInput">🖼️ Photo/Video</label>
+              <label class="attach-option" for="inlineFileInput" style="cursor:pointer;">🖼️ Photo/Video</label>
               <input type="file" id="inlineFileInput" accept="image/*,video/*" style="display:none;">
               <span class="attach-option">👤 Tag</span>
             </div>
@@ -126,7 +126,7 @@
             <button class="top-nav-btn" id="openEditProfileBtn">Edit Profile</button>
           </div>
         </div>
-        <div id="profileGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;"></div>
+        <div id="profileGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:15px;"></div>
       </section>
 
       <!-- SEARCH PAGE -->
@@ -250,6 +250,6 @@
 
   <div class="toast" id="toast">Message</div>
 
-<script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>
