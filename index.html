@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Banxxgram</title>
   
+  <!-- Suppress missing favicon error -->
+  <link rel="icon" href="data:,">
+
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -54,6 +57,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      cursor: pointer;
     }
 
     .brand-logo-icon {
@@ -323,13 +327,6 @@
       line-height: 1.4;
     }
 
-    .media-container {
-      position: relative;
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
     .post-image-preview {
       width: 100%;
       border-radius: 12px;
@@ -363,29 +360,6 @@
 
     .action-item.liked {
       color: #ff3366 !important;
-      transform: scale(1.05);
-    }
-
-    /* HEART POP ANIMATION ON DOUBLE TAP */
-    .heart-pop {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      font-size: 4rem;
-      pointer-events: none;
-      opacity: 0;
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-    }
-
-    .heart-pop.pop {
-      animation: heartAnimation 0.8s forwards;
-    }
-
-    @keyframes heartAnimation {
-      0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.8; }
-      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
     }
 
     /* AVATARS */
@@ -463,6 +437,36 @@
       cursor: pointer;
       font-size: 0.8rem;
       font-weight: bold;
+    }
+
+    /* PROFILE STYLES */
+    .profile-header-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
     }
 
     /* MODAL SYSTEM */
@@ -545,7 +549,7 @@
 
   <!-- TOP NAVBAR -->
   <header class="top-navbar">
-    <div class="brand-container">
+    <div class="brand-container nav-item" data-page="home-page">
       <div class="brand-logo-icon">📷</div>
       <h1 class="brand-title">Banxxgram</h1>
     </div>
@@ -571,7 +575,7 @@
     <!-- LEFT SIDEBAR -->
     <aside class="left-sidebar">
       <div class="user-profile-summary">
-        <div class="avatar-orange-gradient" id="sidebarAvatar">B</div>
+        <div class="avatar-orange-gradient nav-item" data-page="profile-page" id="sidebarAvatar" style="cursor:pointer;">B</div>
       </div>
 
       <nav class="sidebar-menu">
@@ -600,7 +604,198 @@
       
       <!-- HOME PAGE -->
       <section id="home-page" class="page active">
-        
         <!-- STORIES TRAY -->
         <div class="stories-container">
-          <div class="
+          <div class="story-item">
+            <div class="story-ring add-story">+</div>
+            <small>Your Story</small>
+          </div>
+          <div class="story-item">
+            <div class="story-ring">LB</div>
+            <small>llynda</small>
+          </div>
+          <div class="story-item">
+            <div class="story-ring">SS</div>
+            <small>sarah</small>
+          </div>
+        </div>
+
+        <!-- CREATE POST INLINE CARD -->
+        <div class="create-post-card">
+          <div class="create-post-top">
+            <div class="avatar-sm" id="createPostAvatar">B</div>
+            <input type="text" id="inlinePostContent" placeholder="What's on your mind?">
+          </div>
+          <div class="create-post-bottom">
+            <label class="attach-media-options">
+              🖼 Photo/Video
+              <input type="file" id="inlineFileInput" accept="image/*" style="display:none;">
+            </label>
+            <button class="btn-orange-post" id="inlinePostBtn">Post</button>
+          </div>
+        </div>
+
+        <!-- FEED CONTAINER -->
+        <div id="feedContainer" style="display: flex; flex-direction: column; gap: 20px;"></div>
+      </section>
+
+      <!-- SEARCH PAGE -->
+      <section id="search-page" class="page">
+        <div class="widget-card">
+          <h2 style="margin-bottom: 15px;">Discover Content</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Type into the search bar above to filter posts or find users instantly.</p>
+        </div>
+      </section>
+
+      <!-- PROFILE PAGE -->
+      <section id="profile-page" class="page">
+        <div class="profile-header-card">
+          <div class="avatar-orange-gradient" id="profileAvatar" style="width: 80px; height: 80px; font-size: 1.8rem;">B</div>
+          <div class="profile-info">
+            <h2 id="profileUsername">@anold.banxx</h2>
+            <p id="profileBio">Creator & Developer</p>
+            <div class="profile-stats">
+              <span><strong id="postCount">0</strong> Posts</span>
+              <span><strong id="followersCount">128</strong> Followers</span>
+              <span><strong>94</strong> Following</span>
+            </div>
+            <button class="top-nav-btn btn-sign-in" id="openEditProfileBtn" style="margin-top: 10px; width: fit-content;">Edit Profile</button>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 10px;">My Posts</h3>
+        <div id="profileGrid" class="profile-grid"></div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="right-sidebar">
+      <div class="widget-card">
+        <div class="widget-title">Suggested for you</div>
+        <div class="suggested-users-list">
+          <div class="suggested-user-item">
+            <div class="post-author-info">
+              <div class="avatar-sm">LB</div>
+              <div class="author-names">
+                <strong>@llynda.banxx</strong>
+                <small>Suggested</small>
+              </div>
+            </div>
+            <button class="btn-follow-outline">Follow</button>
+          </div>
+          <div class="suggested-user-item">
+            <div class="post-author-info">
+              <div class="avatar-sm">SS</div>
+              <div class="author-names">
+                <strong>@sarah.styles</strong>
+                <small>Suggested</small>
+              </div>
+            </div>
+            <button class="btn-follow-outline">Follow</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-title">Trending Hashtags</div>
+        <div class="trending-list">
+          <div class="trending-item">
+            <span class="trending-tag">#Banxxgram</span>
+            <span class="trending-count">1.2k posts</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-tag">#Fashion</span>
+            <span class="trending-count">850 posts</span>
+          </div>
+          <div class="trending-item">
+            <span class="trending-tag">#GoodVibes</span>
+            <span class="trending-count">640 posts</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="editProfileModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeEditProfileBtn" class="modal-close">&times;</button>
+      <h2 style="margin-bottom: 16px;">Edit Profile</h2>
+      <form id="editProfileForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editFullName" required>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="editUsername" required>
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea id="editBio" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn-orange-post" style="width: 100%; justify-content: center; margin-top: 10px;">Save Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE POST MODAL -->
+  <div id="createPostModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeCreatePostBtn" class="modal-close">&times;</button>
+      <h2 style="margin-bottom: 16px;">Create New Post</h2>
+      <form id="createPostForm">
+        <div class="form-group">
+          <label>Caption</label>
+          <textarea id="postContent" placeholder="Write a caption..." rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Attach Media</label>
+          <input type="file" id="postMediaFile" accept="image/*">
+        </div>
+        <button type="submit" class="btn-orange-post" style="width: 100%; justify-content: center; margin-top: 10px;">Share Post</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- COMMENTS MODAL -->
+  <div id="commentsModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeCommentsBtn" class="modal-close">&times;</button>
+      <h2 style="margin-bottom: 16px;">Comments</h2>
+      <div id="commentsList" style="display: flex; flex-direction: column; gap: 10px; max-height: 240px; overflow-y: auto; margin-bottom: 16px;"></div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="commentInput" placeholder="Add a comment..." style="flex: 1; background: #061022; border: 1px solid var(--panel-border); padding: 10px; border-radius: 8px; color: #fff; outline: none;">
+        <button id="sendCommentBtn" class="btn-orange-post">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeAuthBtn" class="modal-close">&times;</button>
+      <h2 id="authModalTitle" style="margin-bottom: 16px;">Sign In</h2>
+      <form id="authForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" required>
+        </div>
+        <button type="submit" id="authSubmitBtn" class="btn-orange-post" style="width: 100%; justify-content: center; margin-top: 10px;">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast">Action performed successfully!</div>
+
+  <!-- MAIN JS SCRIPT WITH CACHE BUSTING -->
+  <script src="app.js?v=2"></script>
+</body>
+</html>
