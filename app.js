@@ -54,6 +54,7 @@ async function initApp() {
   }
   updateUIWithUser(currentUser);
   renderPosts(allPosts);
+  renderProfileGrid();
 }
 
 function loadDemoPosts() {
@@ -83,6 +84,31 @@ function loadDemoPosts() {
       comments: ['Amazing outfit!']
     }
   ];
+}
+
+async function fetchSupabasePosts() {
+  if (!supabaseClient) return;
+  const { data, error } = await supabaseClient
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (data && !error && data.length > 0) {
+    allPosts = data.map(post => ({
+      id: post.id,
+      user_id: post.user_id || currentUser.id,
+      author: post.username ? `@${post.username}` : '@user',
+      location: post.location || 'Kampala, Uganda',
+      caption: post.caption || '',
+      media_url: post.media_url || '',
+      likes: post.likes_count || 0,
+      liked: false,
+      saved: false,
+      comments: post.comments || []
+    }));
+  } else {
+    loadDemoPosts();
+  }
 }
 
 async function loadUserProfile() {
@@ -154,12 +180,23 @@ function setupNavigation() {
       const targetPageId = item.getAttribute('data-page');
       if (!targetPageId) return;
 
-      navItems.forEach(i => i.classList.remove('active'));
       pages.forEach(p => p.classList.remove('active'));
-
-      document.querySelectorAll(`.nav-item[data-page="${targetPageId}"]`).forEach(btn => btn.classList.add('active'));
       const targetPage = document.getElementById(targetPageId);
-      if (targetPage) targetPage.classList.add('active');
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
+
+      document.querySelectorAll('.top-nav-btn, .sidebar-btn, .brand-container').forEach(btn => {
+        if (btn.getAttribute('data-page') === targetPageId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      if (targetPageId === 'profile-page') {
+        renderProfileGrid();
+      }
     });
   });
 }
@@ -246,4 +283,266 @@ function setupForms() {
   });
 
   document.getElementById('createPostForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault
+    e.preventDefault();
+    const caption = document.getElementById('postContent').value;
+    const mediaFile = document.getElementById('postMediaFile')?.files[0];
+
+    let mediaUrl = '';
+    if (mediaFile) {
+      const uploadedUrl = await uploadMediaToSupabase(mediaFile, 'post-media');
+      mediaUrl = uploadedUrl || URL.createObjectURL(mediaFile);
+    }
+
+    await createNewPost(caption, mediaUrl);
+    document.getElementById('createPostModal').classList.add('hidden');
+    document.getElementById('postContent').value = '';
+    if (document.getElementById('postMediaFile')) {
+      document.getElementById('postMediaFile').value = '';
+    }
+  });
+
+  document.getElementById('inlinePostBtn')?.addEventListener('click', async () => {
+    const input = document.getElementById('inlinePostContent');
+    const mediaFile = document.getElementById('inlineFileInput')?.files[0];
+    if ((input && input.value.trim() !== '') || mediaFile) {
+      let mediaUrl = '';
+      if (mediaFile) {
+        const uploadedUrl = await uploadMediaToSupabase(mediaFile, 'post-media');
+        mediaUrl = uploadedUrl || URL.createObjectURL(mediaFile);
+      }
+      await createNewPost(input.value.trim(), mediaUrl);
+      input.value = '';
+      if (document.getElementById('inlineFileInput')) {
+        document.getElementById('inlineFileInput').value = '';
+      }
+    }
+  });
+
+  document.getElementById('sendCommentBtn')?.addEventListener('click', () => {
+    const commentInput = document.getElementById('commentInput');
+    if (!commentInput || !activeCommentPostId) return;
+
+    const text = commentInput.value.trim();
+    if (text === '') return;
+
+    const post = allPosts.find(p => p.id === activeCommentPostId);
+    if (post) {
+      post.comments.push(`${currentUser.username}: ${text}`);
+      renderComments(post.comments);
+      commentInput.value = '';
+      showToast('Comment added!');
+    }
+  });
+}
+
+async function createNewPost(caption, mediaUrl) {
+  const newPostObj = {
+    id: `post-${Date.now()}`,
+    user_id: currentUser.id,
+    author: `@${currentUser.username}`,
+    location: currentUser.location,
+    caption: caption,
+    media_url: mediaUrl,
+    likes: 0,
+    liked: false,
+    saved: false,
+    comments: []
+  };
+
+  if (supabaseClient) {
+    const { error } = await supabaseClient.from('posts').insert([{
+      user_id: currentUser.id,
+      username: currentUser.username,
+      caption: caption,
+      media_url: mediaUrl,
+      likes_count: 0
+    }]);
+
+    if (error) {
+      console.error('Supabase post insert failed:', error.message);
+    }
+  }
+
+  allPosts.unshift(newPostObj);
+  renderPosts(allPosts);
+  renderProfileGrid();
+  showToast('Post created!');
+}
+
+// ==========================================
+// 5. RENDERING & INTERACTIONS
+// ==========================================
+function renderPosts(posts) {
+  const feedContainer = document.getElementById('feedContainer');
+  if (!feedContainer) return;
+
+  feedContainer.innerHTML = posts.map(post => `
+    <div class="feed-post-card" data-id="${post.id}">
+      <div class="post-card-header">
+        <div class="post-author-info">
+          <div class="avatar-sm">${post.author.replace('@', '').charAt(0).toUpperCase()}</div>
+          <div class="author-names">
+            <strong>${post.author}</strong>
+            <small>${post.location}</small>
+          </div>
+        </div>
+      </div>
+
+      <p class="post-caption-text">${post.caption}</p>
+
+      ${post.media_url ? `
+        <div class="media-container" style="position:relative;">
+          <img src="${post.media_url}" class="post-image-preview" alt="Post media">
+          <div class="heart-pop" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) scale(0); font-size: 4rem; transition: transform 0.2s ease; pointer-events:none;">❤️</div>
+        </div>
+      ` : ''}
+
+      <div class="post-action-bar">
+        <div class="left-actions">
+          <span class="action-item ${post.liked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+            ${post.liked ? '❤️' : '🤍'} ${post.likes}
+          </span>
+          <span class="action-item" onclick="openComments('${post.id}')">
+            💬 ${post.comments.length}
+          </span>
+        </div>
+        <span class="action-item" onclick="toggleSave('${post.id}')">
+          ${post.saved ? '🔖 Saved' : '📌 Save'}
+        </span>
+      </div>
+    </div>
+  `).join('');
+
+  setupDoubleTapHeart();
+}
+
+function setupDoubleTapHeart() {
+  document.querySelectorAll('.media-container').forEach(container => {
+    let lastTap = 0;
+    container.addEventListener('click', (e) => {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTap;
+      if (tapLength < 300 && tapLength > 0) {
+        const card = container.closest('.feed-post-card');
+        const postId = card?.getAttribute('data-id');
+        if (postId) {
+          toggleLike(postId, true);
+          const heartPop = container.querySelector('.heart-pop');
+          if (heartPop) {
+            heartPop.style.transform = 'translate(-50%, -50%) scale(1.2)';
+            setTimeout(() => {
+              heartPop.style.transform = 'translate(-50%, -50%) scale(0)';
+            }, 600);
+          }
+        }
+      }
+      lastTap = currentTime;
+    });
+  });
+}
+
+function toggleLike(postId, forceLike = false) {
+  const post = allPosts.find(p => p.id === postId);
+  if (!post) return;
+
+  if (forceLike) {
+    if (!post.liked) {
+      post.liked = true;
+      post.likes += 1;
+    }
+  } else {
+    post.liked = !post.liked;
+    post.likes += post.liked ? 1 : -1;
+  }
+
+  renderPosts(allPosts);
+}
+
+function toggleSave(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (!post) return;
+
+  post.saved = !post.saved;
+  showToast(post.saved ? 'Post saved!' : 'Post removed from saved');
+  renderPosts(allPosts);
+}
+
+function openComments(postId) {
+  activeCommentPostId = postId;
+  const post = allPosts.find(p => p.id === postId);
+  if (!post) return;
+
+  renderComments(post.comments);
+  document.getElementById('commentsModal')?.classList.remove('hidden');
+}
+
+function renderComments(comments) {
+  const commentsList = document.getElementById('commentsList');
+  if (!commentsList) return;
+
+  if (comments.length === 0) {
+    commentsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No comments yet. Be the first!</p>';
+    return;
+  }
+
+  commentsList.innerHTML = comments.map(c => `
+    <div style="background: #061022; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem;">
+      ${c}
+    </div>
+  `).join('');
+}
+
+function renderProfileGrid() {
+  const grid = document.getElementById('profileGrid');
+  const postCountEl = document.getElementById('postCount');
+  if (!grid) return;
+
+  const myPosts = allPosts.filter(p => p.user_id === currentUser.id || p.author.includes(currentUser.username));
+  if (postCountEl) postCountEl.textContent = myPosts.length;
+
+  if (myPosts.length === 0) {
+    grid.innerHTML = '<p style="grid-column: 1 / -1; color: var(--text-muted);">No posts shared yet.</p>';
+    return;
+  }
+
+  grid.innerHTML = myPosts.map(p => `
+    <div style="background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 8px; height: 120px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 8px;">
+      ${p.media_url ? `<img src="${p.media_url}" style="width:100%; height:100%; object-fit:cover;">` : `<p>${p.caption}</p>`}
+    </div>
+  `).join('');
+}
+
+function setupSearch() {
+  const searchInput = document.getElementById('searchInput');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (query === '') {
+      renderPosts(allPosts);
+      return;
+    }
+
+    const filtered = allPosts.filter(p => 
+      p.caption.toLowerCase().includes(query) || 
+      p.author.toLowerCase().includes(query)
+    );
+    renderPosts(filtered);
+  });
+}
+
+function setupSidebarAndWidgets() {
+  document.querySelectorAll('.btn-follow-outline').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.textContent === 'Follow') {
+        btn.textContent = 'Following';
+        btn.style.background = 'var(--accent-blue)';
+        btn.style.color = '#fff';
+      } else {
+        btn.textContent = 'Follow';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--accent-blue)';
+      }
+    });
+  });
+}
